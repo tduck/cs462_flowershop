@@ -1,3 +1,5 @@
+package com.jeffrey.server;
+
 import com.jeffrey.server.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -115,7 +117,7 @@ public class BasicResponseTest {
             s.stop();
     }
 
-    @Test
+    /*@Test
     public void callSelfTest(){
         try {
             JServer server = new JServer(7000, 3);
@@ -202,7 +204,5 @@ public class BasicResponseTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-    }
+    }*/
 }
