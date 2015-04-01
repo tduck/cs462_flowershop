@@ -12,10 +12,6 @@ import java.io.IOException;
 public class GoodHandler implements JHandler {
     @Override
     public Response handle(Request r) {
-        try {
-            return new Response(200).pipe(r.getBody(), "Good!");
-        } catch (IOException e) {
-            return null;
-        }
+        return new Response(200).pipe(r.getBody(), "Good!");
     }
 }

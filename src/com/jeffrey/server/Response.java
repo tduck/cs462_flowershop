@@ -35,26 +35,17 @@ public class Response {
     }
 
 
-    public Response pipe(InputStream is) throws IOException {
-        ByteArray ba = new ByteArray();
-
-        while(is.available() != 0){
-            byte[] t = new byte[is.available()];
-            is.read(t);
-            ba.add(t);
-        }
-
-        response = ba.trim();
-        return this;
+    public Response pipe(InputStream is){
+        return this.pipe(is, "");
     }
 
-    public Response pipe(InputStream is, String s) throws IOException{
-        ByteArray ba = new ByteArray();
-
-        while(is.available() != 0){
-            byte[] t = new byte[is.available()];
-            is.read(t);
-            ba.add(t);
+    public Response pipe(InputStream is, String s){
+        ByteArray ba = null;
+        try {
+            ba = new ByteArray(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+            ba = new ByteArray();
         }
 
         response = ba.trim();
