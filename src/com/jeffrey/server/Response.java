@@ -48,6 +48,21 @@ public class Response {
         return this;
     }
 
+    public Response pipe(InputStream is, String s) throws IOException{
+        ByteArray ba = new ByteArray();
+
+        while(is.available() != 0){
+            byte[] t = new byte[is.available()];
+            is.read(t);
+            ba.add(t);
+        }
+
+        response = ba.trim();
+        if(response.length == 0)
+            response = s.getBytes();
+        return this;
+    }
+
 
     public int getStatus() {
         return status;

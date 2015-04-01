@@ -4,6 +4,8 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URI;
 
 /**
@@ -14,12 +16,14 @@ public class Request {
     private String method;
     private Headers h;
     private URI uri;
+    private InetSocketAddress address;
     public Request(HttpExchange e){
         //System.out.println("Making request");
         is = e.getRequestBody();
         method = e.getRequestMethod();
         h = e.getRequestHeaders();
         uri = e.getRequestURI();
+        address = e.getRemoteAddress();
         //System.out.println("Request made");
     }
 
@@ -38,5 +42,9 @@ public class Request {
 
     public URI getURI() {
         return uri;
+    }
+
+    public InetSocketAddress getAddress() {
+        return address;
     }
 }
