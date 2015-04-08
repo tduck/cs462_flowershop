@@ -30,41 +30,39 @@ public class DriverSite {
             s.register("/main", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                    if(r.getMethod().equals("POST")){
-                        try {                        	
-                            return new Response(200).pipe(r.getBody());                            
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-//                    try
-//                    {
-//	                    TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
-//	               	 
-//	                    // Build a filter for the MessageList
-//	                    List<NameValuePair> params = new ArrayList<NameValuePair>();
-//	                    params.add(new BasicNameValuePair("Body", "I am listening to Bayside!"));
-//	                    params.add(new BasicNameValuePair("To", "+18013765960"));
-//	                    params.add(new BasicNameValuePair("From", "+13852194380"));
-//	                 
-//	                    MessageFactory messageFactory = client.getAccount().getMessageFactory();
-//	                    Message message = messageFactory.create(params);
-//	                    System.out.println(message.getSid());
-//                	                        	
-//	                    return new Response(200, "Hello world");
-//                    } 
-//                    catch (Exception e)
-//                    {
-//                    	return new Response(405);
-//                    }
-					return new Response(200, JServer.getFileContents("web/driver_site_main.html"));
+					return new Response(200, ServerUtils.getFileContents("web/driver_site_main.html"));
                 }
             });
+            
+            /**
+             * Twilio Send Message
+             * 
+             * try
+                {
+                    TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
+               	 
+                    // Build a filter for the MessageList
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("Body", "I am listening to Bayside!"));
+                    params.add(new BasicNameValuePair("To", "+18013765960"));
+                    params.add(new BasicNameValuePair("From", "+13852194380"));
+                 
+                    MessageFactory messageFactory = client.getAccount().getMessageFactory();
+                    Message message = messageFactory.create(params);
+                    System.out.println(message.getSid());
+            	                        	
+                    return new Response(200, "Hello world");
+                } 
+                catch (Exception e)
+                {
+                	return new Response(405);
+                }
+             */
             
             s.register("/register", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                	return new Response(200, JServer.getFileContents("web/register.html"));
+                	return new Response(200, ServerUtils.getFileContents("web/register.html"));
                 }
             });
             
