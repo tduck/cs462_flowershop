@@ -5,7 +5,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 
 /**
@@ -34,6 +39,29 @@ public class JServer{
 
     public HttpContext register(String s, JHandler h){
         return server.createContext(s, new HandlerWrapper(h));
+    }
+        
+    public static String getFileContents(String pathname)
+    {
+		String result = "";
+    	try
+    	{
+    		  FileInputStream fstream = new FileInputStream(pathname);
+    		  DataInputStream in = new DataInputStream(fstream);
+    		  BufferedReader br = new BufferedReader(new InputStreamReader(in));
+    		  String strLine;
+
+    		  while ((strLine = br.readLine()) != null)   
+    		  {
+    			  result += strLine;
+    		  }
+    		  in.close();
+    	}
+    	catch (Exception e)
+    	{
+    		System.err.println("Error: " + e.getMessage());
+    	}   
+		return result;
     }
 
 

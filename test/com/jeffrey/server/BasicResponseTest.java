@@ -37,7 +37,7 @@ public class BasicResponseTest {
                     if(r.getMethod().equals("POST")){
                         try {
                             return new Response(500).pipe(r.getBody());
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -78,7 +78,7 @@ public class BasicResponseTest {
                     if(r.getMethod().equals("POST")){
                         try {
                             return new Response(200).pipe(r.getBody());
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
