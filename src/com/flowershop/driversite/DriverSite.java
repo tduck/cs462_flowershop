@@ -123,14 +123,32 @@ public class DriverSite {
                 }
             });
             
-            /*
-             * Delivery Ready Event Consumer
+            
+            /**
+             * 	EVENT PRODUCERS (3):
+             * 		- Twilio Send SMS Event Producer
+             * 		- Delivery Complete Event Producer
+             * 		- Bid Available Event Producer              
              */
-            s.register("/delivery_ready", new JHandler() {
+            
+            /**
+             * 
+             * 	EVENT CONSUMERS (4)
+             * 
+             */
+            
+            /*
+             * RFQ Delivery Ready Event Consumer
+             * 
+             * 		Will contain:
+             * 			- Twilio Send SMS Event Producer
+             */
+            s.register("/rfq_delivery_ready", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                 	       
                 	/**
+                	 * TODO:
                 	 * You will be signaling one event in this lab. 
                 	 	The event domain and name must be the following:
 
@@ -166,24 +184,11 @@ public class DriverSite {
             s.register("/checkin", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
-                	                	
-                    if(r.getMethod().equals("POST")){
+                	if(r.getMethod().equals("POST")){
                         try {
-                            return new Response(200).pipe(r.getBody());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return new Response(200, "Checkin");
-                }
-            });
-            
-            s.register("/receive_sms", new JHandler() {             
-                @Override
-                public Response handle(Request r) {
-                	                	
-                    if(r.getMethod().equals("POST")){
-                        try {
+                        	
+                        	// TODO Update user's most recent checkin in database
+                        	
                             return new Response(200).pipe(r.getBody());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -194,21 +199,24 @@ public class DriverSite {
             });
             
             /*
+             * Twilio Receive SMS Event Consumer
              * 
+             * 		Will include:
+             * 			- Delivery Complete Event Producer
+             * 			- Bid Available Event Producer
              */
-            s.register("/sms", new JHandler() {             
+            s.register("/twilio_receive_sms", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
                 	
                 	/*
-                	 * type 1: Bid
-                	 * type 2: Order Complete
-                	 */
+                	 * type 1: Bid Available
+                	*/
                 	
-                    // TODO Receive order complete message
-                    // TODO Process message
-                    // TODO Alert driver's guild                   
-                    // TODO Alert flower shop website
+                	
+                    // Type 2: Delivery Complete
+                    // TODO send event to driver's guild                   
+                    // TODO send event to flower shop website
                 	
                     if(r.getMethod().equals("POST")){
                         try {
@@ -222,6 +230,37 @@ public class DriverSite {
                 }
             });
             
+            /*
+             * RFQ Bid Awarded Event Consumer
+             * 
+             * 		Will include:
+             * 			- Twilio Send SMS Event Producer
+             */
+            s.register("/rfq_bid_awarded", new JHandler() {             
+                @Override
+                public Response handle(Request r) {
+                    if(r.getMethod().equals("POST")){
+                        try {
+                        	
+                        	// TODO Retrieve driver phone number
+                        	// TODO Send Twilio message to driver
+                        	
+                            return new Response(200).pipe(r.getBody());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    ServerUtils.addToLog(ServerUtils.inputStreamToString(r.getBody()));
+                    return new Response(200, "SMS");
+                }
+            });
+
+            
+            /**
+             * 
+             * LOGGING UTILS
+             * 
+             */
             s.register("/view_log", new JHandler() {             
                 @Override
                 public Response handle(Request r) {                	

@@ -36,47 +36,7 @@ public class FlowerShopSite {
                 }
             });
             
-            /*
-             * Delivery Ready Event Producer
-             */
-            s.register("/place_order", new JHandler() {
-                @Override
-                public Response handle(Request r) {
-                     if(r.getMethod().equals("POST")){
-                         try {
-                        	 
-                        	 // TODO Notify Drivers Guild of event
-                        	 
-                        	 
-                             return new Response(200).pipe(r.getBody());
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                         }
-                     }
-                     return new Response(405);
-                }
-            });
             
-            /*
-             * Delivery Pickup Event Producer
-             */
-            s.register("/delivery_pickup", new JHandler() {
-                @Override
-                public Response handle(Request r) {
-                     if(r.getMethod().equals("POST")){
-                         try {
-                        	 
-                        	 // TODO Notify Drivers Guild of event
-                        	 
-                        	 
-                             return new Response(200).pipe(r.getBody());
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                         }
-                     }
-                     return new Response(405);
-                }
-            });
             
                        
             s.register("/login", new JHandler() {
@@ -120,25 +80,143 @@ public class FlowerShopSite {
                 }
             });
             
-            s.register("/assign_bids", new JHandler() {
+           
+            
+            /**
+             * 
+             * 	EVENT PRODUCERS (3)
+             * 
+             */
+                        
+            /*
+             * RFQ Delivery Ready Event Producer
+             */
+            s.register("/place_order", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                	if (loggedIn == true && r.getMethod().equals("POST")){
+                     if(r.getMethod().equals("POST")){
                          try {
                         	 
-                // TODO Retrieve available bids for orders at the given flower shop location
+                        	 // TODO Send event to Drivers' Guild
+                        	 
+                        	 
+                             return new Response(200).pipe(r.getBody());
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(405);
+                }
+            });
+            
+            /*
+             * Delivery Pickup Event Producer
+             */
+            s.register("/delivery_pickup", new JHandler() {
+                @Override
+                public Response handle(Request r) {
+                     if(r.getMethod().equals("POST")){
+                         try {
+                        	 
+                        	 // TODO Send event to Drivers' Guild
+                        	 
+                        	 
+                             return new Response(200).pipe(r.getBody());
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(405);
+                }
+            });
+            
+            /*
+             * RFQ Bid Awarded Event Producer
+             */
+            s.register("/rfq_bid_awarded", new JHandler() {
+                @Override
+                public Response handle(Request r) {
+                	if (r.getMethod().equals("POST")){
+                         try {         
+                        	 
+                        	 // TODO Send event to Drivers' Guild
                         	 
                              return new Response(200).pipe(r.getBody());
                          } catch (Exception e) {
                              e.printStackTrace();
                          }
                 	}
-                	return new Response(200, ServerUtils.getFileContents("web/flower_shop_main.html"));
+                	return new Response(405);
                 }
             });
             
             
+            /**
+             * 
+             * 	EVENT CONSUMERS (2)
+             * 
+             */
             
+            /*
+             * Delivery Complete Event Consumer
+             */
+            s.register("/delivery_complete", new JHandler() {
+                @Override
+                public Response handle(Request r) {
+                     if(r.getMethod().equals("POST")){
+                         try {
+                        	 
+                         // TODO Determine what this event consumer does
+                        	 
+                        	 return new Response(200).pipe(r.getBody());
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(405);
+                }
+            });
+            
+            /*
+             * RFQ Bid Available Event Consumer
+             */
+            s.register("/rfq_bid_available", new JHandler() {
+                @Override
+                public Response handle(Request r) {
+                     if(r.getMethod().equals("POST")){
+                         try {
+                        	 
+                        	 // TODO Store bid information in database
+                        	 
+                        	 return new Response(200).pipe(r.getBody());
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(405);
+                }
+            });
+            
+            
+            /**
+             * 
+             * LOGGING UTILS
+             * 
+             */
+            s.register("/view_log", new JHandler() {             
+                @Override
+                public Response handle(Request r) {                	
+                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                }
+            });
+            
+            s.register("/clear_log", new JHandler() {             
+                @Override
+                public Response handle(Request r) { 
+                	ServerUtils.clearLog();
+                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                }
+            });
         }
         
         catch (IOException e) {
