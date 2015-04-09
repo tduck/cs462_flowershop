@@ -1,8 +1,11 @@
 package com.flowershop;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +37,36 @@ public class ServerUtils {
     	}   
 		return result;
     }
+	
+	public static void addToLog(String newContent)
+	{
+		String existingContent = getFileContents("log.xml");
+		existingContent += "<item>\n" + newContent + "\n</item>\n";
+		
+		try
+		{
+			File file = new File("log.xml");
+			if (!file.exists())
+			{
+				file.createNewFile();
+			}
+			FileWriter fstream = new FileWriter("log.xml");
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write(existingContent);
+			
+			out.close();
+		}
+		catch (Exception e) 
+		{
+			System.err.println("Error: " + e.getMessage());
+		}		
+	}
+	
+	public static void clearLog()
+	{
+		File file = new File("log.xml");
+		file.delete();
+	}
 	
 	public static String inputStreamToString(InputStream is)
 	{

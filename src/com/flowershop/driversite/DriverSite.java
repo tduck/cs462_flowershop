@@ -31,6 +31,9 @@ public class DriverSite {
 
 	private static class Twilio {
 		
+		/*
+		 * Used in Twilio SMS event generation
+		 */
 		public static void sendMessage(String phone, String body) 
 		{
 			try
@@ -48,9 +51,10 @@ public class DriverSite {
 	            System.out.println(message.getSid());
 	    	                        	
 	        } 
-	        catch (Exception e)
+	        catch (TwilioRestException e)
 	        {
 	        	e.printStackTrace();
+	        	ServerUtils.addToLog(e.getErrorMessage());
 	        }
 		}
 	}
@@ -86,12 +90,14 @@ public class DriverSite {
                     if(r.getMethod().equals("POST")){
                         try {
                         	
-                        // TODO Add driver to the system.
-
-                            String query = ServerUtils.inputStreamToString(r.getBody());
+                        	// Parse query string
+	                        String query = ServerUtils.inputStreamToString(r.getBody());
                         	Map<String, String> values = ServerUtils.getQueryMap(query);
 
+                            // TODO Add driver to the system.
+
                         	System.out.println(values.toString());
+                        	ServerUtils.addToLog(values.toString());
                         	
                         	return new Response(200, query);
                         	
@@ -117,6 +123,9 @@ public class DriverSite {
                 }
             });
             
+            /*
+             * Delivery Ready Event Consumer
+             */
             s.register("/delivery_ready", new JHandler() {
                 @Override
                 public Response handle(Request r) {
@@ -151,6 +160,9 @@ public class DriverSite {
                 }
             });
                     
+            /*
+             * Foursquare Checkin Event Consumer
+             */
             s.register("/checkin", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
@@ -181,16 +193,21 @@ public class DriverSite {
                 }
             });
             
-            s.register("/order_complete", new JHandler() {             
+            /*
+             * 
+             */
+            s.register("/sms", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
                 	
+                	/*
+                	 * type 1: Bid
+                	 * type 2: Order Complete
+                	 */
+                	
                     // TODO Receive order complete message
-                    
                     // TODO Process message
-                    
-                    // TODO Alert driver's guild
-                    
+                    // TODO Alert driver's guild                   
                     // TODO Alert flower shop website
                 	
                     if(r.getMethod().equals("POST")){
@@ -200,7 +217,23 @@ public class DriverSite {
                             e.printStackTrace();
                         }
                     }
-                    return new Response(200, "Order complete");
+                    ServerUtils.addToLog(ServerUtils.inputStreamToString(r.getBody()));
+                    return new Response(200, "SMS");
+                }
+            });
+            
+            s.register("/view_log", new JHandler() {             
+                @Override
+                public Response handle(Request r) {                	
+                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                }
+            });
+            
+            s.register("/clear_log", new JHandler() {             
+                @Override
+                public Response handle(Request r) { 
+                	ServerUtils.clearLog();
+                    return new Response(200, ServerUtils.getFileContents("log.xml"));
                 }
             });
             
