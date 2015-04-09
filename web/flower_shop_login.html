@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<title>Flower Shop</title>
+	</head>
+	<body>
+		<h1>Login</h1>
+		<form action='/login' method='POST'>
+			<table>
+				<tr>
+					<td>Location:</td>
+					<td>
+						<select name='location'>
+							<option value='0'>Provo</option>
+							<option value='1'>Salt Lake</option>
+							<option value='2'>Ogden</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>Password:</td>
+					<td>
+						<input type='password' name='password'>
+					</td>
+			</table>
+			<input type='submit' value='Login'>
+		</form>
+		<p><a href='/main'>Back</a></p>
+	</body>
+</html>
