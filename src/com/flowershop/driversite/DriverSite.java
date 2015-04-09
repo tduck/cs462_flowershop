@@ -3,21 +3,58 @@ package com.flowershop.driversite;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.flowershop.ServerUtils;
 import com.jeffrey.server.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
 import com.twilio.sdk.resource.instance.Message;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 
 public class DriverSite {
 	
 	private final static String ACCOUNT_SID = "AC15f0c7bd26137ed319deffa2022b84cb";
 	private final static String AUTH_TOKEN = "1eba8cbc1c6de15ad1c454b55f3aebf3";
 
+	private static class Twilio {
+		
+		public static void sendMessage(String phone, String body) 
+		{
+			try
+	        {
+	            TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
+	       	 
+	            // Build a filter for the MessageList
+	            List<NameValuePair> params = new ArrayList<NameValuePair>();
+	            params.add(new BasicNameValuePair("Body", body));
+	            params.add(new BasicNameValuePair("To", phone));
+	            params.add(new BasicNameValuePair("From", "+13852194380"));
+	         
+	            MessageFactory messageFactory = client.getAccount().getMessageFactory();
+	            Message message = messageFactory.create(params);
+	            System.out.println(message.getSid());
+	    	                        	
+	        } 
+	        catch (Exception e)
+	        {
+	        	e.printStackTrace();
+	        }
+		}
+	}
+	
 	public static void main(String[] args) {
 		JServer s;
         try {
@@ -26,6 +63,8 @@ public class DriverSite {
             
             String flowerShopURL = "localhost:8080/";
             String driversGuildURL = "localhost:8080/";
+                        
+            // TODO Setup DB
             
             s.register("/main", new JHandler() {
                 @Override
@@ -33,32 +72,7 @@ public class DriverSite {
 					return new Response(200, ServerUtils.getFileContents("web/driver_site_main.html"));
                 }
             });
-            
-            /**
-             * Twilio Send Message
-             * 
-             * try
-                {
-                    TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
-               	 
-                    // Build a filter for the MessageList
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("Body", "I am listening to Bayside!"));
-                    params.add(new BasicNameValuePair("To", "+18013765960"));
-                    params.add(new BasicNameValuePair("From", "+13852194380"));
-                 
-                    MessageFactory messageFactory = client.getAccount().getMessageFactory();
-                    Message message = messageFactory.create(params);
-                    System.out.println(message.getSid());
-            	                        	
-                    return new Response(200, "Hello world");
-                } 
-                catch (Exception e)
-                {
-                	return new Response(405);
-                }
-             */
-            
+                        
             s.register("/register", new JHandler() {
                 @Override
                 public Response handle(Request r) {
@@ -73,9 +87,14 @@ public class DriverSite {
                         try {
                         	
                         // TODO Add driver to the system.
+
+                            String query = ServerUtils.inputStreamToString(r.getBody());
+                        	Map<String, String> values = ServerUtils.getQueryMap(query);
+
+                        	System.out.println(values.toString());
                         	
+                        	return new Response(200, query);
                         	
-                            return new Response(200).pipe(r.getBody());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
