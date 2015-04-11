@@ -1,6 +1,11 @@
 package com.flowershop.flowershopsite;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,6 +19,13 @@ public class FlowerShopSite {
 
 	private static boolean loggedIn = false;
 	private static String currentShop = "";
+	
+	private static String driversGuildURL = "http://localhost:8000";
+	
+	private static String jdbcConnection = 
+			"jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com:3306/employees?user=sa&password=mypassword";
+
+	private static String username = "flowershop";
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -37,35 +49,77 @@ public class FlowerShopSite {
                 }
             });
             
-            s.register("/add_location", new JHandler() {
+            s.register("/shops", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try {
-                         	 String flowerShopID = UUID.randomUUID().toString().replaceAll("-", "");
-                        	 
-                        	 String query = ServerUtils.inputStreamToString(r.getBody());
-                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
-                        	 
-                        	 if (values.get("location_name") != null
-                        			 && values.get("latitude") != null 
-                        			 && Math.abs(Double.parseDouble(values.get("latitude"))) <= 180
-                        			 && values.get("longitude") != null 
-                        			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
-                        	 {
-                            	 // TODO Send location info to Drivers' Guild
+                    	 String flowerShopID = UUID.randomUUID().toString().replaceAll("-", "");
+                    	 
+                    	 String query = ServerUtils.inputStreamToString(r.getBody());
+                    	 Map<String, String> values = ServerUtils.getQueryMap(query);
+                    	 
+                    	 if (values.get("location_name") != null
+                    			 && values.get("latitude") != null 
+                    			 && Math.abs(Double.parseDouble(values.get("latitude"))) <= 180
+                    			 && values.get("longitude") != null 
+                    			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
+                    	 {
+                        	 // TODO Send location info to Drivers' Guild
 
-                                 return new Response(200, "Location successfully added with ID " + 
+                    		 try
+                    		 {
+                    			 query += "&id=" + flowerShopID;
+                        		 String postURL = driversGuildURL + "/shops/";
+                        		 URL obj = new URL(postURL);
+                        		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                        		 
+                        		 con.setRequestMethod("POST");
+                        		 con.setDoOutput(true);
+                        		 
+                        		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                        		 wr.writeBytes(query);
+                        		 
+                        		 wr.flush();
+                        		 wr.close();
+                        		 
+                        		 int responseCode = con.getResponseCode();
+                    			 System.out.println("\nSending 'POST' request to URL : " + postURL);
+                    			 System.out.println("Post parameters : " + query);
+								 System.out.println("Response Code : " + responseCode);
+									 
+								BufferedReader in = new BufferedReader(
+								        new InputStreamReader(con.getInputStream()));
+								String inputLine;
+								StringBuffer response = new StringBuffer();
+						 
+								while ((inputLine = in.readLine()) != null) {
+									response.append(inputLine);
+								}
+								in.close();
+						 
+								//print result
+								System.out.println(response.toString());
+								
+								 if (con.getResponseCode() == 200)
+								 {
+									 return new Response(200, "Location successfully added with ID " + 
                                 		 flowerShopID + ".");
-                        	 }
-                        	 else
-                        	 {
-                        		 return new Response(200, "Invalid latitude/longitude value(s). Try again.");
-                        	 }
-                        	 
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                         }
+								 }
+								 else
+								 {
+									 return new Response(500);
+								 }
+                    		 } 
+                    		 catch (IOException e) 
+                    		 {
+                    			 e.printStackTrace();
+                    			 return new Response(500);
+                    		 }
+                    	 }
+                    	 else
+                    	 {
+                    		 return new Response(200, "Invalid latitude/longitude value(s). Try again.");
+                    	 }
                      }
                      return new Response(200, ServerUtils.getFileContents("web/flower_shop_add.html"));
                 }

@@ -62,29 +62,18 @@ public class DriverSite {
 	public static void main(String[] args) {
 		JServer s;
         try {
-            s = new JServer(8000);
+            s = new JServer(8002);
             s.start();
             
-            String flowerShopURL = "localhost:8080/";
-            String driversGuildURL = "localhost:8080/";
+            String flowerShopURL = "http://localhost:8001/";
+            String driversGuildURL = "http://localhost:8000/";
                         
             // TODO Setup DB
             
-            s.register("/main", new JHandler() {
-                @Override
-                public Response handle(Request r) {
-					return new Response(200, ServerUtils.getFileContents("web/driver_site_main.html"));
-                }
-            });
-                        
-            s.register("/register", new JHandler() {
-                @Override
-                public Response handle(Request r) {
-                	return new Response(200, ServerUtils.getFileContents("web/register.html"));
-                }
-            });
+            s.register("/home", new WebsiteHandler("web/driver_site"));
             
-            s.register("/add_driver", new JHandler() {
+            // Add new driver
+            s.register("/drivers/post", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                     if(r.getMethod().equals("POST")){
@@ -96,9 +85,7 @@ public class DriverSite {
 
                             // TODO Add driver to the system.
 
-                        	System.out.println(values.toString());
-                        	ServerUtils.addToLog(values.toString());
-                        	
+
                         	return new Response(200, query);
                         	
                         } catch (Exception e) {
@@ -109,7 +96,8 @@ public class DriverSite {
                 }
             });
             
-            s.register("/list_drivers", new JHandler() {
+            // Show all drivers
+            s.register("/drivers/list", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                     if(r.getMethod().equals("POST")){
