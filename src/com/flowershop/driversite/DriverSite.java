@@ -1,9 +1,15 @@
 package com.flowershop.driversite;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.flowershop.ServerUtils;
 import com.jeffrey.server.*;
@@ -29,6 +35,9 @@ public class DriverSite {
 	private final static String ACCOUNT_SID = "AC15f0c7bd26137ed319deffa2022b84cb";
 	private final static String AUTH_TOKEN = "1eba8cbc1c6de15ad1c454b55f3aebf3";
 
+	private static String driversGuildURL = "http://localhost:8000";
+	private static String flowerShopURL = "http://localhost:8001";
+	
 	private static class Twilio {
 		
 		/*
@@ -64,10 +73,7 @@ public class DriverSite {
         try {
             s = new JServer(8002);
             s.start();
-            
-            String flowerShopURL = "http://localhost:8001/";
-            String driversGuildURL = "http://localhost:8000/";
-                        
+                                    
             // TODO Setup DB
             
             s.register("/home", new WebsiteHandler("web/driver_site"));
@@ -76,24 +82,72 @@ public class DriverSite {
             s.register("/drivers/post", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                    if(r.getMethod().equals("POST")){
-                        try {
-                        	
-                        	// Parse query string
-	                        String query = ServerUtils.inputStreamToString(r.getBody());
-                        	Map<String, String> values = ServerUtils.getQueryMap(query);
+                    if(r.getMethod().equals("POST"))
+                    {                        	
+                    	String driverID = UUID.randomUUID().toString().replaceAll("-", "");
+                    	
+                    	// Parse query string
+                        String query = ServerUtils.inputStreamToString(r.getBody());
+                    	Map<String, String> values = ServerUtils.getQueryMap(query);
 
-                            // TODO Add driver to the system.
-
-
-                        	return new Response(200, query);
-                        	
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+                        // TODO Add driver to the system.
+                    	if (values.get("phone") != null && values.get("email") != null) 
+                    	{
+                        	try
+	                   		{
+	                   			 query += "&id=" + driverID;
+	                       		 String postURL = driversGuildURL + "/drivers/";
+	                       		 URL obj = new URL(postURL);
+	                       		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+	                       		 
+	                       		 con.setRequestMethod("POST");
+	                       		 con.setDoOutput(true);
+	                       		 
+	                       		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+	                       		 wr.writeBytes(query);
+	                       		 
+	                       		 wr.flush();
+	                       		 wr.close();
+	                       		 
+	                       		/* 
+	                       		 	int responseCode = con.getResponseCode();
+		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
+		                    		System.out.println("Post parameters : " + query);
+		                    		System.out.println("Response Code : " + responseCode);
+		                     
+		                    		BufferedReader in = new BufferedReader(
+		                    		        new InputStreamReader(con.getInputStream()));
+		                    		String inputLine;
+		                    		StringBuffer response = new StringBuffer();
+		                     
+		                    		while ((inputLine = in.readLine()) != null) {
+		                    			response.append(inputLine);
+		                    		}
+		                    		in.close();
+		                    	*/
+	                     
+	                    		//print result
+	                    		System.out.println(response.toString());
+	                       		                         		 							
+								 if (con.getResponseCode() == 200)
+								 {
+									 return new Response(200, "Driver successfully added with ID " + 
+											 driverID + ".");
+								 }
+								 else
+								 {
+									 return new Response(500);
+								 }
+	                   		 } 
+	                   		 catch (IOException e) 
+	                   		 {
+	                   			 e.printStackTrace();
+	                   			 return new Response(500);
+	                   		 }
+                    	}
+                    }                                   	
                     return new Response(200, "Hello world");
-                }
+            	}
             });
             
             // Show all drivers

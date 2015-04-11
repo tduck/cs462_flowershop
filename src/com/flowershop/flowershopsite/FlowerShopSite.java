@@ -81,25 +81,7 @@ public class FlowerShopSite {
                         		 
                         		 wr.flush();
                         		 wr.close();
-                        		 
-                        		 int responseCode = con.getResponseCode();
-                    			 System.out.println("\nSending 'POST' request to URL : " + postURL);
-                    			 System.out.println("Post parameters : " + query);
-								 System.out.println("Response Code : " + responseCode);
-									 
-								BufferedReader in = new BufferedReader(
-								        new InputStreamReader(con.getInputStream()));
-								String inputLine;
-								StringBuffer response = new StringBuffer();
-						 
-								while ((inputLine = in.readLine()) != null) {
-									response.append(inputLine);
-								}
-								in.close();
-						 
-								//print result
-								System.out.println(response.toString());
-								
+                        		                         		                        		                         		 							
 								 if (con.getResponseCode() == 200)
 								 {
 									 return new Response(200, "Location successfully added with ID " + 
