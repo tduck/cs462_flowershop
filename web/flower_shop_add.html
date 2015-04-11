@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<title>Flower Shop</title>
+	</head>
+	<body>
+		<style>
+			table {
+				border: 1px solid black;
+			}
+			
+			td {
+				padding: 5px;
+			}
+		</style>
+		<h1>Flower Shop</h1>
+		<h4>Add Location</h4>
+		<form action='/add_location' method='POST'>
+			<table>
+				
+				<tr>
+					<td>Location Name:</td>
+					<td><input type='text' name='location_name'></td>
+				</tr>
+				<tr>
+					<td>Latitude:</td>
+					<td><input type='text' name='latitude'></td>
+				</tr>
+				<tr>
+					<td>Longitude:</td>
+					<td><input type='text' name='longitude'></td>
+				</tr>
+			</table>
+			<br>
+			<input type='submit' value='Submit'>
+		</form>
+	</body>
+</html>

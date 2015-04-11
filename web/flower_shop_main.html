@@ -3,6 +3,15 @@
 		<title>Flower Shop</title>
 	</head>
 	<body>
+		<style>
+			table {
+				border: 1px solid black;
+			}
+			
+			td {
+				padding: 5px;
+			}
+		</style>
 		<h1>Flower Shop</h1>
 		<p><a href='/login'>Owner Login</a></p>
 		<h4>Order Form</h4>
@@ -16,9 +25,34 @@
 					</td>
 				</tr>
 				<tr>
-					<td></td>
-					<td></td>
+					<td>Flowers: </td>
+					<td>
+						<select name='flowers'>
+							<option value='0'>Roses</option>
+							<option value='1'>Sunflowers</option>
+							<option value='2'>Tulips</option>
+							<option value='0'>Lilies</option>							
+						</select>
+					</td>
 				</tr>
+				<tr>
+					<td>First Name:</td>
+					<td><input type='text' name='first_name'></td>
+				</tr>
+				<tr>
+					<td>Last Name:</td>
+					<td><input type='text' name='last_name'></td>
+				</tr>
+				<tr>
+					<td>Delivery Address:</td>
+					<td><input type='text' name='address'></td>
+				</tr>
+				<tr>
+					<td>Email:</td>
+					<td><input type='text' name='email'></td>
+				</tr>
+			</table>
+			<br>
 			<input type='submit' value='Place Order'>
 		</form>
 	</body>

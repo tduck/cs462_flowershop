@@ -2,6 +2,7 @@ package com.flowershop.flowershopsite;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 import com.flowershop.ServerUtils;
 import com.jeffrey.server.JHandler;
@@ -36,6 +37,39 @@ public class FlowerShopSite {
                 }
             });
             
+            s.register("/add_location", new JHandler() {
+                @Override
+                public Response handle(Request r) {
+                     if(r.getMethod().equals("POST")){
+                         try {
+                         	 String flowerShopID = UUID.randomUUID().toString().replaceAll("-", "");
+                        	 
+                        	 String query = ServerUtils.inputStreamToString(r.getBody());
+                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
+                        	 
+                        	 if (values.get("location_name") != null
+                        			 && values.get("latitude") != null 
+                        			 && Math.abs(Double.parseDouble(values.get("latitude"))) <= 180
+                        			 && values.get("longitude") != null 
+                        			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
+                        	 {
+                            	 // TODO Send location info to Drivers' Guild
+
+                                 return new Response(200, "Location successfully added with ID " + 
+                                		 flowerShopID + ".");
+                        	 }
+                        	 else
+                        	 {
+                        		 return new Response(200, "Invalid latitude/longitude value(s). Try again.");
+                        	 }
+                        	 
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(200, ServerUtils.getFileContents("web/flower_shop_add.html"));
+                }
+            });
             
             
                        
@@ -96,11 +130,25 @@ public class FlowerShopSite {
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
                          try {
+                        	
+                        	 String orderID = UUID.randomUUID().toString();
+                        	 
+                        	 String result = "<html><head></head><body>";
+                        	 result += "<p>Thank you, your order has been processed. Your order ID is "
+                        			 + orderID.replaceAll("-", "") + "</p>";
+                        	 
+                        	 String query = ServerUtils.inputStreamToString(r.getBody());
+                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
+
+                             result += "<p>Location: " + values.get("location") + "<br>";
+                             result += "Customer: " + values.get("first_name") + " " + values.get("last_name") + "<br>";
+                             result += "Address: " + values.get("address") + "<br>";
+                             result += "Email: " + values.get("email");
                         	 
                         	 // TODO Send event to Drivers' Guild
-                        	 
-                        	 
-                             return new Response(200).pipe(r.getBody());
+
+                        	 result += "</p><a href=''>Home</a></body></html>";
+                             return new Response(200, result);
                          } catch (Exception e) {
                              e.printStackTrace();
                          }
