@@ -14,10 +14,12 @@ public class DriversGuild {
 		
 		JServer s;
         try {
-            s = new JServer(8000);
+            s = new JServer(8080);
             s.start();
+
+            
                        
-            s.register("/main", new JHandler() {
+            /*s.register("/main", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
@@ -29,7 +31,7 @@ public class DriversGuild {
                      }
                      return new Response(405);
                 }
-            });
+            });*/
             
             
             /**
@@ -48,7 +50,7 @@ public class DriversGuild {
              * 		Will include:
              * 			- RFQ Delivery Ready Event Producer/Forward
              */
-            s.register("/rfq_delivery_ready", new JHandler() {
+            /*s.register("/rfq_delivery_ready", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
@@ -60,7 +62,7 @@ public class DriversGuild {
                      }
                      return new Response(405);
                 }
-            });
+            });*/
             
             /*
              * RFQ Bid Awarded Event Consumer
@@ -68,7 +70,7 @@ public class DriversGuild {
              * 		Will include:
              * 			- RFQ Bid Awarded Event Producer/Forward
              */
-            s.register("/rfq_delivery_ready", new JHandler() {
+            /*s.register("/rfq_delivery_ready", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
@@ -80,12 +82,12 @@ public class DriversGuild {
                      }
                      return new Response(405);
                 }
-            });
+            });*/
             
             /*
              * Delivery Pickup Event Consumer 
              */
-            s.register("/delivery_pickup", new JHandler() {
+            /*s.register("/delivery_pickup", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
@@ -100,12 +102,12 @@ public class DriversGuild {
                      }
                      return new Response(405);
                 }
-            });
+            });*/
             
             /*
              * Delivery Complete Event Consumer
              */
-            s.register("/delivery_complete", new JHandler() {
+            /*s.register("/delivery_complete", new JHandler() {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
@@ -120,7 +122,7 @@ public class DriversGuild {
                      }
                      return new Response(405);
                 }
-            });
+            });*/
             
             
             /**
