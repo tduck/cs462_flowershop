@@ -2,6 +2,9 @@ package com.flowershop.flowershopsite;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -28,7 +31,6 @@ public class FlowerShopSite {
 	private static String username = "flowershop";
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		JServer s;
         try {
@@ -38,14 +40,26 @@ public class FlowerShopSite {
             s.register("/main", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                     if(r.getMethod().equals("POST")){
+                    if(r.getMethod().equals("POST"))
+                    {
                          try {
+                        	 // TODO Create dynamic page with locations from DB
+                        	 
                              return new Response(200).pipe(r.getBody());
                          } catch (Exception e) {
                              e.printStackTrace();
-                         }
-                     }
-                     return new Response(200, ServerUtils.getFileContents("web/flower_shop_main.html"));
+                             return new Response(405);
+                         }                         
+                    }
+                    else try 
+                    {
+						return new Response(200).pipe(new FileInputStream(new File("web/flower_shop/main.html")));
+					} 
+                    catch (FileNotFoundException e) 
+                    {
+						e.printStackTrace();
+						return new Response(404);
+					}
                 }
             });
             
@@ -64,11 +78,9 @@ public class FlowerShopSite {
                     			 && values.get("longitude") != null 
                     			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
                     	 {
-                        	 // TODO Send location info to Drivers' Guild
-
                     		 try
                     		 {
-                    			 query += "&id=" + flowerShopID;
+                    			 query += "&shop_id=" + flowerShopID;
                         		 String postURL = driversGuildURL + "/shops/";
                         		 URL obj = new URL(postURL);
                         		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -103,7 +115,14 @@ public class FlowerShopSite {
                     		 return new Response(200, "Invalid latitude/longitude value(s). Try again.");
                     	 }
                      }
-                     return new Response(200, ServerUtils.getFileContents("web/flower_shop_add.html"));
+                     else try
+                     {
+                    	 return new Response(200).pipe(new FileInputStream(new File("web/flower_shop/add_shop.html")));
+                     }
+                     catch (FileNotFoundException e)
+                     {
+                    	 return new Response(404);
+                     }
                 }
             });
             
@@ -113,32 +132,39 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try 
-                         {
-                        	// Parse query string
- 	                        String query = ServerUtils.inputStreamToString(r.getBody());
-                         	Map<String, String> values = ServerUtils.getQueryMap(query);
-                         	
-                         	if (values.get("password") != null && values.get("password").equals("1234"))
-                         	{
-                         		loggedIn = true;
-                         		currentShop = values.get("location");
-                         		
-                                // TODO Retrieve available bids for orders at the given flower shop location
-                         		
-                         		return new Response(200, ServerUtils.getFileContents("web/flower_shop_assign_bids.html"));
-                         	}
-                         	else
-                         	{
-                         		return new Response(200, "Incorrect login. Click your browser's Back button to try again.");
-                         	}
-                         } 
-                         catch (Exception e) 
-                         {
-                             e.printStackTrace();
-                         }
+                         
+                    	// Parse query string
+                        String query = ServerUtils.inputStreamToString(r.getBody());
+                     	Map<String, String> values = ServerUtils.getQueryMap(query);
+                     	
+                     	if (values.get("password") != null && values.get("password").equals("1234"))
+                     	{
+                     		loggedIn = true;
+                     		currentShop = values.get("location");
+                     		
+                            // TODO Retrieve available bids for orders at the given flower shop location
+                     		try
+                     		{
+                     			return new Response(200).pipe(new FileInputStream(new File(("web/flower_shop/admin.html"))));
+                     		}
+                     		catch (FileNotFoundException e)
+                     		{
+                     			return new Response(404);
+                     		}
+                     	}
+                     	else
+                     	{
+                     		return new Response(200, "Incorrect login. Click your browser's Back button to try again.");
+                     	}
                      }
-                     return new Response(200, ServerUtils.getFileContents("web/flower_shop_login.html"));
+                     else try
+                     {
+                    	 return new Response(200).pipe(new FileInputStream(new File(("web/flower_shop/login.html"))));
+                     }
+                     catch (FileNotFoundException e)
+                     {
+                    	 return new Response(404);
+                     }
                 }
             });
             
@@ -146,7 +172,14 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      loggedIn = false;
-                     return new Response(200, ServerUtils.getFileContents("web/flower_shop_main.html"));
+                     try
+                     {
+                    	 return new Response(200).pipe(new FileInputStream(new File("web/flower_shop/main.html")));
+                     }
+                     catch (FileNotFoundException e)
+                     {
+                    	 return new Response(404);
+                     }
                 }
             });
             
@@ -165,29 +198,71 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try {
-                        	
-                        	 String orderID = UUID.randomUUID().toString();
-                        	 
-                        	 String result = "<html><head></head><body>";
-                        	 result += "<p>Thank you, your order has been processed. Your order ID is "
-                        			 + orderID.replaceAll("-", "") + "</p>";
-                        	 
-                        	 String query = ServerUtils.inputStreamToString(r.getBody());
-                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
+                                                 	
+                    	 String orderID = UUID.randomUUID().toString().replaceAll("-", "");
+                    	
+                    	 String query = ServerUtils.inputStreamToString(r.getBody());
+                    	 Map<String, String> values = ServerUtils.getQueryMap(query);
 
-                             result += "<p>Location: " + values.get("location") + "<br>";
-                             result += "Customer: " + values.get("first_name") + " " + values.get("last_name") + "<br>";
-                             result += "Address: " + values.get("address") + "<br>";
-                             result += "Email: " + values.get("email");
-                        	 
-                        	 // TODO Send event to Drivers' Guild
-
-                        	 result += "</p><a href=''>Home</a></body></html>";
-                             return new Response(200, result);
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                         }
+                    	 if (values.get("email") != null
+                    			 && values.get("first_name") != null
+                    			 && values.get("last_name") != null
+                    			 && values.get("address") != null)
+                    	 {
+                    		 try
+                    		 {
+                    			 query += "&order_id=" + orderID;
+                        		 String postURL = driversGuildURL + "/orders/";
+                        		 URL obj = new URL(postURL);
+                        		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                        		 
+                        		 con.setRequestMethod("POST");
+                        		 con.setDoOutput(true);
+                        		 
+                        		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                        		 wr.writeBytes(query);
+                        		 
+                        		 wr.flush();
+                        		 wr.close();
+                        		 
+                        		 /* 
+	                       		 	int responseCode = con.getResponseCode();
+		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
+		                    		System.out.println("Post parameters : " + query);
+		                    		System.out.println("Response Code : " + responseCode);
+		                     
+		                    		BufferedReader in = new BufferedReader(
+		                    		        new InputStreamReader(con.getInputStream()));
+		                    		String inputLine;
+		                    		StringBuffer response = new StringBuffer();
+		                     
+		                    		while ((inputLine = in.readLine()) != null) {
+		                    			response.append(inputLine);
+		                    		}
+		                    		in.close();
+		                    	
+	                     
+		                    		//print result
+		                    		System.out.println(response.toString());
+	                       		*/
+                        		                         		                        		                         		 							
+								 if (con.getResponseCode() == 200)
+								 {
+									 return new Response(200, "Order placed successfully. Your order ID is " + 
+                                		orderID + ".");
+								 }
+								 else
+								 {
+									 return new Response(500);
+								 }
+                    		 } 
+                    		 catch (IOException e) 
+                    		 {
+                    			 e.printStackTrace();
+                    			 return new Response(500);
+                    		 }
+                    	 }                        
+                    	 else return new Response(200, "There was an error in processing your order. One or more required fields were not completed.");                       
                      }
                      return new Response(405);
                 }
@@ -289,8 +364,15 @@ public class FlowerShopSite {
              */
             s.register("/view_log", new JHandler() {             
                 @Override
-                public Response handle(Request r) {                	
-                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                public Response handle(Request r) {     
+                	try
+                	{
+                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
+                	}
+                	catch (FileNotFoundException e)
+                	{
+                		return new Response(404);
+                	}
                 }
             });
             
@@ -298,7 +380,14 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) { 
                 	ServerUtils.clearLog();
-                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                	try
+                	{
+                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
+                	}
+                	catch (FileNotFoundException e)
+                	{
+                		return new Response(404);
+                	}
                 }
             });
         }

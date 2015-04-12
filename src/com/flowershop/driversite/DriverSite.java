@@ -2,6 +2,9 @@ package com.flowershop.driversite;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -95,7 +98,7 @@ public class DriverSite {
                     	{
                         	try
 	                   		{
-	                   			 query += "&id=" + driverID;
+	                   			 query += "&driver_id=" + driverID;
 	                       		 String postURL = driversGuildURL + "/drivers/";
 	                       		 URL obj = new URL(postURL);
 	                       		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -124,11 +127,12 @@ public class DriverSite {
 		                    			response.append(inputLine);
 		                    		}
 		                    		in.close();
-		                    	*/
+		                    	
 	                     
-	                    		//print result
-	                    		System.out.println(response.toString());
-	                       		                         		 							
+		                    		//print result
+		                    		System.out.println(response.toString());
+	                       		*/
+	                       		 
 								 if (con.getResponseCode() == 200)
 								 {
 									 return new Response(200, "Driver successfully added with ID " + 
@@ -305,8 +309,15 @@ public class DriverSite {
              */
             s.register("/view_log", new JHandler() {             
                 @Override
-                public Response handle(Request r) {                	
-                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                public Response handle(Request r) {     
+                	try
+                	{
+                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
+                	}
+                	catch (FileNotFoundException e)
+                	{
+                		return new Response(404);
+                	}
                 }
             });
             
@@ -314,7 +325,14 @@ public class DriverSite {
                 @Override
                 public Response handle(Request r) { 
                 	ServerUtils.clearLog();
-                    return new Response(200, ServerUtils.getFileContents("log.xml"));
+                	try
+                	{
+                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
+                	}
+                	catch (FileNotFoundException e)
+                	{
+                		return new Response(404);
+                	}
                 }
             });
             
