@@ -27,13 +27,13 @@ public class FlowerShopSite {
 	private static boolean loggedIn = false;
 	private static String currentShop = "";
 	
-	private static String driversGuildURL = "http://localhost:8000";
+	private static String driversGuildURL = "http://52.8.36.38:8080";
 	
 	public static void main(String[] args) {
 		
 		JServer s;
         try {
-            s = new JServer(8001);
+            s = new JServer(8080);
             s.start();
                        
             s.register("/main", new JHandler() {
