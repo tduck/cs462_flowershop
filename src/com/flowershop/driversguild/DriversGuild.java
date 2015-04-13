@@ -7,6 +7,7 @@ import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.driversguild.dao.OrderDAO;
 import com.flowershop.model.Driver;
+import com.flowershop.model.Order;
 import com.google.gson.Gson;
 import com.jeffrey.server.JHandler;
 import com.jeffrey.server.JServer;
@@ -19,6 +20,7 @@ public class DriversGuild {
 
 	public static void main(String[] args) {
 		driverDAO = new DriverDAO();
+        orderDAO = new OrderDAO();
 		JServer s;
         try {
             s = new JServer(8080);
@@ -70,17 +72,29 @@ public class DriversGuild {
                 }
             });
 
-            s.register("/shops", new JHandler() {
-                @Override
-                public Response handle(Request request) {
-                    return null;
-                }
-            });
-
             s.register("/orders", new JHandler() {
                 @Override
                 public Response handle(Request request) {
-                    return null;
+                    if(request.getMethod().equals("POST")){
+                        Scanner scanner = new Scanner(request.getBody());
+                        scanner.useDelimiter("\\A");
+                        Gson gson = new Gson();
+                        Order order;
+                        try {
+                            order = gson.fromJson(scanner.next(), Order.class);
+                        } catch(Exception e){
+                            return new Response(500);
+                        }
+                        if(order.getDeliveryLocation() == null)
+                            return new Response(400);
+                        order = orderDAO.createOrder(order);
+                        if(order == null)
+                            return new Response(500);
+                        else
+                            return new Response(201).send(order);
+                    } else{
+                        return new Response(405);
+                    }
                 }
             });
                        

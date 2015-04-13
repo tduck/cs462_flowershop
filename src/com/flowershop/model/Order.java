@@ -4,8 +4,17 @@ package com.flowershop.model;
  * Created by jeffrey on 4/12/15.
  */
 public class Order {
+    private int id;
     private String shopId;
     private Location deliveryLocation;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getShopId() {
         return shopId;
