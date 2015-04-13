@@ -266,19 +266,15 @@ public class DriverSite {
                     // TODO send event to driver's guild                   
                     // TODO send event to flower shop website
                 	
-                    if(r.getMethod().equals("POST"))
+                	try 
                     {
-                        try 
-                        {
-                        	return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
-                        } 
-                        catch (Exception e) 
-                        {
-                            e.printStackTrace();
-                            return new Response(500);
-                        }
+                    	return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
+                    } 
+                    catch (Exception e) 
+                    {
+                        e.printStackTrace();
+                        return new Response(500);
                     }
-                	return new Response(405);
                 }
             });
             
