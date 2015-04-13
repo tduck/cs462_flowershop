@@ -14,7 +14,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.flowershop.ServerUtils;
+import com.flowershop.driversguild.dao.DeliveryDAO;
+import com.flowershop.driversguild.dao.OrderDAO;
 import com.flowershop.driversguild.dao.ShopDAO;
+import com.flowershop.model.Delivery;
 import com.flowershop.model.Location;
 import com.flowershop.model.Order;
 import com.flowershop.model.Shop;
@@ -25,9 +28,6 @@ import com.jeffrey.server.Request;
 import com.jeffrey.server.Response;
 
 public class FlowerShopSite {
-
-	private static boolean loggedIn = false;
-	private static String currentShop = "";
 	
 	private static String driversGuildURL = "http://52.8.36.38:8080";
 	
@@ -122,54 +122,70 @@ public class FlowerShopSite {
                     	// Parse query string
                         String query = ServerUtils.inputStreamToString(r.getBody());
                      	Map<String, String> values = ServerUtils.getQueryMap(query);
+                     	String shopID = values.get("location");
                      	
-                     	if (values.get("password") != null && values.get("password").equals("1234"))
+                        // TODO Retrieve available bids for orders at the given flower shop location
+                     	OrderDAO orderDAO = new OrderDAO();
+                     	DeliveryDAO deliveryDAO = new DeliveryDAO();
+                     	
+                     	List<Order> orders = orderDAO.getOrders(shopID);
+                     	if (orders == null)
                      	{
-                     		loggedIn = true;
-                     		currentShop = values.get("location");
+                     		return new Response(500);
+                     	}
+                     	
+//                     	System.out.println(shopID);
+                     	
+                     	String content = ServerUtils.getFileContents("web/flower_shop/admin.html");
+                     	String table = "<table><tr><th>ID</th>"
+                     			+ "<th>Delivery Address</th>"
+                     			+ "<th>Customer Email</th>"
+                     			+ "<th></th></tr>";
+                     	for (Order order : orders)
+                     	{
+                     		table += "<tr><td>" + order.getId() + "</td>";
+                     		table += "<td>" + order.getAddress() + "</td>";
+                     		table += "<td>" + order.getEmailaddress() + "</td>";
+                     		table += "<td><form action='' method='POST'>" + "<input type='submit'></form></td></tr>";
                      		
-                            // TODO Retrieve available bids for orders at the given flower shop location
-                     		try
+                     		table += "<tr>";
+                     		List<Delivery> deliveries = deliveryDAO.getDeliveries(order.getId());
+                     		if (deliveries == null)
                      		{
-                     			return new Response(200).pipe(new FileInputStream(new File(("web/flower_shop/admin.html"))));
+                     			return new Response(500);
                      		}
-                     		catch (FileNotFoundException e)
+                     		for (Delivery delivery : deliveries)
                      		{
-                     			return new Response(404);
+                     			table += "<tr>" + "</tr>";
                      		}
+                     		
+                     		table += "</tr>";
                      	}
-                     	else
-                     	{
-                     		return new Response(200, "Incorrect login. Click your browser's Back button to try again.");
-                     	}
+                     	table += "</table>";
+                     	
+                     	return new Response(200, content.replaceAll("<table></table>", table));
+                 		                     	
                      }
-                     else try
+                     else 
                      {
-                    	 return new Response(200).pipe(new FileInputStream(new File(("web/flower_shop/login.html"))));
-                     }
-                     catch (FileNotFoundException e)
-                     {
-                    	 return new Response(404);
+                    	 ShopDAO shopDAO = new ShopDAO();
+                    	 List<Shop> shops = shopDAO.getShops();
+                    	 if (shops == null)
+                    	 {
+                    		 return new Response(500);
+                    	 }
+                    	 String content = ServerUtils.getFileContents("web/flower_shop/login.html");
+                    	 String options = "";
+                    	 for (Shop shop : shops)
+                    	 {
+                    		options += "<option value='" + shop.getID() + "'>" + shop.getName().replace('+', ' ') + "</option>"; 
+                    	 }              
+                    	 content = content.replaceAll("<option value='0'>Error loading locations</option>", options);
+                    	 return new Response(200, content);
                      }
                 }
             });
             
-            s.register("/logout", new JHandler() {
-                @Override
-                public Response handle(Request r) {
-                     loggedIn = false;
-                     try
-                     {
-                    	 return new Response(200).pipe(new FileInputStream(new File("web/flower_shop/main.html")));
-                     }
-                     catch (FileNotFoundException e)
-                     {
-                    	 return new Response(404);
-                     }
-                }
-            });
-            
-           
             
             /**
              * 

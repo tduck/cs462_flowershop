@@ -22,16 +22,16 @@ public class OrderDAO {
                 "flowershop?user=" + System.getenv("username") + "&password=" + System.getenv("password"));
     }
 
-    public List<Order> getOrders(String id) {
+    public List<Order> getOrders(String shopid) {
         try {
             List<Order> orders = new ArrayList<>();
             connection = getConnection();
             PreparedStatement s = connection.prepareStatement("SELECT * FROM flowershop.orders WHERE shopid = ?");
-            s.setString(1, id);
+            s.setString(1, shopid);
             ResultSet rs = s.executeQuery();
             while(rs.next()){
                 Order order = new Order();
-                order.setShopid(id);
+                order.setShopid(shopid);
                 order.setId(rs.getInt("id"));
                 Location deliveryLocation = new Location();
                 deliveryLocation.setLatitude(rs.getFloat("latitude"));
@@ -70,5 +70,25 @@ public class OrderDAO {
             }
             return null;
         }
+    }
+    
+    public boolean setOrderComplete(String id, String status)
+    {
+        try 
+        {
+			connection = getConnection();
+	        connection.setAutoCommit(false);
+	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET delivered = ? WHERE id = ?");
+	        s.setString(1, status); 
+	        s.setString(2, id);
+	        s.executeUpdate();
+	        connection.close();	        
+	        return true;
+        } 
+        catch (SQLException e) 
+        {
+			e.printStackTrace();
+			return false;
+		}
     }
 }

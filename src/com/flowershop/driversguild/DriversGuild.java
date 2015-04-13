@@ -84,7 +84,7 @@ public class DriversGuild {
                         } catch(Exception e){
                             return new Response(500);
                         }
-                        if(order.getDeliveryLocation() == null)
+                        if(order.getDeliverylocation() == null)
                             return new Response(400);
                         order = orderDAO.createOrder(order);
                         if(order == null)
