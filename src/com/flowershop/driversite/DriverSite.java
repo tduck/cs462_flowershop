@@ -40,8 +40,8 @@ public class DriverSite {
 	private final static String ACCOUNT_SID = "AC15f0c7bd26137ed319deffa2022b84cb";
 	private final static String AUTH_TOKEN = "1eba8cbc1c6de15ad1c454b55f3aebf3";
 
-	private static String driversGuildURL = "http://localhost:8000";
-	private static String flowerShopURL = "http://localhost:8001";
+	private static String driversGuildURL = "http://52.8.36.38:8080";
+	private static String flowerShopURL = "http://52.8.9.109:8080";
 	
 	private static class Twilio {
 		
@@ -76,7 +76,7 @@ public class DriverSite {
 	public static void main(String[] args) {
 		JServer s;
         try {
-            s = new JServer(8002);
+            s = new JServer(8080);
             s.start();
                                     
             // TODO Setup DB
