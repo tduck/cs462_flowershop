@@ -263,23 +263,25 @@ public class DriverSite {
              * 			- Delivery Complete Event Producer
              * 			- Bid Available Event Producer
              */
-            s.register("/twilio_receive_sms", new JHandler() {             
+            s.register("/sms", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
                 	
                 	/*
                 	 * type 1: Bid Available
                 	*/
-                	
-                	
                     // Type 2: Delivery Complete
                     // TODO send event to driver's guild                   
                     // TODO send event to flower shop website
                 	
                     if(r.getMethod().equals("POST")){
-                        try {
+                        try 
+                        {
+                        	Twilio.sendMessage("+18013765960", ServerUtils.inputStreamToString(r.getBody()));
                             return new Response(200).pipe(r.getBody());
-                        } catch (Exception e) {
+                        } 
+                        catch (Exception e) 
+                        {
                             e.printStackTrace();
                         }
                     }
