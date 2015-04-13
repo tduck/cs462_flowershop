@@ -19,14 +19,6 @@ import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.model.Driver;
 import com.jeffrey.server.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -263,28 +255,30 @@ public class DriverSite {
              * 			- Delivery Complete Event Producer
              * 			- Bid Available Event Producer
              */
-            s.register("/twilio_receive_sms", new JHandler() {             
+            s.register("/sms", new JHandler() {             
                 @Override
                 public Response handle(Request r) {
                 	
                 	/*
                 	 * type 1: Bid Available
                 	*/
-                	
-                	
                     // Type 2: Delivery Complete
                     // TODO send event to driver's guild                   
                     // TODO send event to flower shop website
                 	
-                    if(r.getMethod().equals("POST")){
-                        try {
-                            return new Response(200).pipe(r.getBody());
-                        } catch (Exception e) {
+                    if(r.getMethod().equals("POST"))
+                    {
+                        try 
+                        {
+                        	return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
+                        } 
+                        catch (Exception e) 
+                        {
                             e.printStackTrace();
+                            return new Response(500);
                         }
                     }
-                    ServerUtils.addToLog(ServerUtils.inputStreamToString(r.getBody()));
-                    return new Response(200, "SMS");
+                	return new Response(405);
                 }
             });
             
