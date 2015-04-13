@@ -16,7 +16,9 @@ import java.util.UUID;
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.ShopDAO;
 import com.flowershop.model.Location;
+import com.flowershop.model.Order;
 import com.flowershop.model.Shop;
+import com.google.gson.Gson;
 import com.jeffrey.server.JHandler;
 import com.jeffrey.server.JServer;
 import com.jeffrey.server.Request;
@@ -187,32 +189,43 @@ public class FlowerShopSite {
                     	
                     	 String query = ServerUtils.inputStreamToString(r.getBody());
                     	 Map<String, String> values = ServerUtils.getQueryMap(query);
-
-                    	 if (values.get("email") != null
-                    			 && values.get("first_name") != null
-                    			 && values.get("last_name") != null
+                    	 System.out.println(values.toString());
+                    	 
+                    	 if (values.get("shop_id") != null
+                    			 && values.get("email") != null
+                    			 && values.get("customer_name") != null
                     			 && values.get("address") != null)
                     	 {
                     		 try
                     		 {
-                    			 query += "&order_id=" + orderID;
+                    			 Order order = new Order();
+                    			 order.setShopid(values.get("shop_id"));
+                    			 order.setAddress(values.get("address") + "," + values.get("city") + "," + values.get("state"));
+                    			 order.setDelivered(false);
+                    			 order.setEmailaddress(values.get("email"));
+                    			 order.setDeliverylocation(new Location());
+                    			                     			 
+                    			 Gson gson = new Gson();
+                    			 String jsonString = gson.toJson(order);
+                    			 
                         		 String postURL = driversGuildURL + "/orders/";
                         		 URL obj = new URL(postURL);
                         		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
                         		 
                         		 con.setRequestMethod("POST");
                         		 con.setDoOutput(true);
+                        		 con.setRequestProperty("Content-Type", "application/json");
                         		 
                         		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                        		 wr.writeBytes(query);
-                        		 
+                        		 wr.writeBytes(jsonString);
+                       		 
                         		 wr.flush();
                         		 wr.close();
                         		 
-                        		 /* 
+                        		 /*
 	                       		 	int responseCode = con.getResponseCode();
 		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-		                    		System.out.println("Post parameters : " + query);
+		                    		System.out.println("Post parameters : " + jsonString);
 		                    		System.out.println("Response Code : " + responseCode);
 		                     
 		                    		BufferedReader in = new BufferedReader(

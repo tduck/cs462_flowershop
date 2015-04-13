@@ -31,12 +31,12 @@ public class OrderDAO {
             ResultSet rs = s.executeQuery();
             while(rs.next()){
                 Order order = new Order();
-                order.setShopId(id);
+                order.setShopid(id);
                 order.setId(rs.getInt("id"));
                 Location deliveryLocation = new Location();
                 deliveryLocation.setLatitude(rs.getFloat("latitude"));
                 deliveryLocation.setLongitude(rs.getFloat("longitude"));
-                order.setDeliveryLocation(deliveryLocation);
+                order.setDeliverylocation(deliveryLocation);
                 orders.add(order);
             }
             connection.close();
@@ -52,9 +52,9 @@ public class OrderDAO {
             connection = getConnection();
             connection.setAutoCommit(false);
             PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.orders(shopid, latitude, longitude) VALUES (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            s.setString(1, order.getShopId());
-            s.setFloat(2, order.getDeliveryLocation().getLatitude());
-            s.setFloat(3, order.getDeliveryLocation().getLongitude());
+            s.setString(1, order.getShopid());
+            s.setFloat(2, order.getDeliverylocation().getLatitude());
+            s.setFloat(3, order.getDeliverylocation().getLongitude());
             s.executeUpdate();
             ResultSet rs = s.getGeneratedKeys();
             rs.next();

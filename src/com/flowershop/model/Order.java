@@ -5,8 +5,12 @@ package com.flowershop.model;
  */
 public class Order {
     private int id;
-    private String shopId;
-    private Location deliveryLocation;
+    private String shopid;
+    private String emailaddress;
+	private String driverphone;
+    private String address;
+    private boolean delivered;
+	private Location deliverylocation;
 
     public int getId() {
         return id;
@@ -16,19 +20,51 @@ public class Order {
         this.id = id;
     }
 
-    public String getShopId() {
-        return shopId;
+    public String getShopid() {
+        return shopid;
     }
 
-    public void setShopId(String shopId) {
-        this.shopId = shopId;
+    public void setShopid(String shopId) {
+        this.shopid = shopId;
     }
 
-    public Location getDeliveryLocation() {
-        return deliveryLocation;
+    public Location getDeliverylocation() {
+        return deliverylocation;
     }
 
-    public void setDeliveryLocation(Location deliveryLocation) {
-        this.deliveryLocation = deliveryLocation;
+    public void setDeliverylocation(Location deliveryLocation) {
+        this.deliverylocation = deliveryLocation;
     }
+    
+    public String getEmailaddress() {
+		return emailaddress;
+	}
+
+	public void setEmailaddress(String emailaddress) {
+		this.emailaddress = emailaddress;
+	}
+
+	public String getDriverphone() {
+		return driverphone;
+	}
+
+	public void setDriverphone(String driverphone) {
+		this.driverphone = driverphone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	 public boolean isDelivered() {
+		return delivered;
+	}
+
+	public void setDelivered(boolean delivered) {
+		this.delivered = delivered;
+	}
 }
