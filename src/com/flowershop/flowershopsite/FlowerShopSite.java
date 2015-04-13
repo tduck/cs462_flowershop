@@ -9,10 +9,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import com.flowershop.ServerUtils;
+import com.flowershop.driversguild.dao.ShopDAO;
+import com.flowershop.model.Location;
+import com.flowershop.model.Shop;
 import com.jeffrey.server.JHandler;
 import com.jeffrey.server.JServer;
 import com.jeffrey.server.Request;
@@ -40,27 +44,25 @@ public class FlowerShopSite {
             s.register("/main", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                    if(r.getMethod().equals("POST"))
-                    {
-                         try {
-                        	 // TODO Create dynamic page with locations from DB
-                        	 
-                             return new Response(200).pipe(r.getBody());
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                             return new Response(405);
-                         }                         
-                    }
-                    else try 
-                    {
-						return new Response(200).pipe(new FileInputStream(new File("web/flower_shop/main.html")));
-					} 
-                    catch (FileNotFoundException e) 
-                    {
-						e.printStackTrace();
-						return new Response(404);
+
+                	ShopDAO shopDAO = new ShopDAO();                 	 	
+					List<Shop> shops = shopDAO.getShops();
+					if (shops == null)
+					{
+						return new Response(500);
 					}
-                }
+					
+					String options = "";
+					for (Shop shop : shops)
+					{
+						System.out.println(shop.getID());
+						options += "<option value='" + shop.getID() + "'>" + shop.getName().replace('+', ' ') + "</option>";
+					}
+					
+					String content = ServerUtils.getFileContents("web/flower_shop/main.html").replaceAll("<option value='0'>Error loading shops</option>", options);
+					
+					return new Response(200, content);
+				}
             });
             
             s.register("/shops", new JHandler() {
@@ -78,36 +80,23 @@ public class FlowerShopSite {
                     			 && values.get("longitude") != null 
                     			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
                     	 {
-                    		 try
+                    		 ShopDAO shopDAO = new ShopDAO();
+                    		 Shop toAdd = new Shop();
+                    		 toAdd.setID(flowerShopID);
+                    		 toAdd.setName(values.get("location_name"));
+                    		 Location location = new Location();
+                    		 location.setLatitude(Float.parseFloat(values.get("latitude")));
+                    		 location.setLongitude(Float.parseFloat(values.get("longitude")));
+                    		 toAdd.setLocation(location);
+                    		 toAdd = shopDAO.createShop(toAdd);
+                    		 
+                    		 if (toAdd == null)
                     		 {
-                    			 query += "&shop_id=" + flowerShopID;
-                        		 String postURL = driversGuildURL + "/shops/";
-                        		 URL obj = new URL(postURL);
-                        		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        		 
-                        		 con.setRequestMethod("POST");
-                        		 con.setDoOutput(true);
-                        		 
-                        		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                        		 wr.writeBytes(query);
-                        		 
-                        		 wr.flush();
-                        		 wr.close();
-                        		                         		                        		                         		 							
-								 if (con.getResponseCode() == 200)
-								 {
-									 return new Response(200, "Location successfully added with ID " + 
-                                		 flowerShopID + ".");
-								 }
-								 else
-								 {
-									 return new Response(500);
-								 }
-                    		 } 
-                    		 catch (IOException e) 
-                    		 {
-                    			 e.printStackTrace();
                     			 return new Response(500);
+                    		 }
+                    		 else
+                    		 {
+                    			 return new Response(200, "Shop created successfully with ID " + flowerShopID);
                     		 }
                     	 }
                     	 else
