@@ -30,7 +30,7 @@ public class OrderDAO {
                 order.setShopId(id);
                 Location deliveryLocation = new Location();
                 deliveryLocation.setLatitude(rs.getFloat("latitude"));
-                deliveryLocation.setLongitude(rs.getFloat("longitute"));
+                deliveryLocation.setLongitude(rs.getFloat("longitude"));
                 order.setDeliveryLocation(deliveryLocation);
                 orders.add(order);
             }
