@@ -29,11 +29,6 @@ public class FlowerShopSite {
 	
 	private static String driversGuildURL = "http://localhost:8000";
 	
-	private static String jdbcConnection = 
-			"jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com:3306/employees?user=sa&password=mypassword";
-
-	private static String username = "flowershop";
-	
 	public static void main(String[] args) {
 		
 		JServer s;

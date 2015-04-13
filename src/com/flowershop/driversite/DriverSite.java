@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.flowershop.ServerUtils;
+import com.flowershop.driversguild.dao.DriverDAO;
+import com.flowershop.model.Driver;
 import com.jeffrey.server.*;
 
 import java.sql.Connection;
@@ -158,14 +160,24 @@ public class DriverSite {
             s.register("/drivers/list", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                    if(r.getMethod().equals("POST")){
-                        try {
-                            return new Response(200).pipe(r.getBody());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return new Response(200, "Hello world");
+                	
+                	DriverDAO driverDAO = new DriverDAO();
+                	List<Driver> drivers = driverDAO.getAllDrivers();
+                	if (drivers == null)
+                	{
+                		return new Response(500);
+                	}
+                	
+                	String list = "<html><head><title>Driver List</title></head><body><table>";
+                	for (Driver driver : drivers)
+                	{
+                		list += "<tr><td>" + driver.getPhone() + "</td>";
+                		list += "<td>" + driver.getName() + "</td>";
+                		list += "</tr>";
+                	}
+                	list += "</table></body></html>";
+                	
+                    return new Response(200, list);
                 }
             });
             

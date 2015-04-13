@@ -15,13 +15,17 @@ public class ShopDAO {
 	
 	private Connection connection;
 	
+	public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com/" +
+                "flowershop?user=" + System.getenv("username") + "&password=" + System.getenv("password"));
+    }
+	
 	public List<Shop> getShops()
 	{
 		try 
 		{
 		  List<Shop> shopList = new ArrayList<Shop>();
-		  connection = DriverManager.getConnection("jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com/" +
-                  "flowershop?user=&password=");
+		  connection = getConnection();
           PreparedStatement s = connection.prepareStatement("SELECT * FROM flowershop.shops");
           ResultSet rs = s.executeQuery();
           while (rs.next())
@@ -49,8 +53,7 @@ public class ShopDAO {
 	{
 		try 
 		{
-            connection = DriverManager.getConnection("jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com/" +
-            		"flowershop?user=&password=");
+            connection = getConnection();
             PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.shops(id, name, latitude, longitude) VALUES(?, ?, ?, ?)");
 
             s.setString(1, shop.getID());
