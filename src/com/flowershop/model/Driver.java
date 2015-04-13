@@ -6,6 +6,7 @@ package com.flowershop.model;
 public class Driver {
     private String phone;
     private String name;
+    private Location lastLocation;
 
     public String getPhone() {
         return phone;
@@ -21,5 +22,13 @@ public class Driver {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Location getLastLocation() {
+        return lastLocation;
+    }
+
+    public void setLastLocation(Location lastLocation) {
+        this.lastLocation = lastLocation;
     }
 }

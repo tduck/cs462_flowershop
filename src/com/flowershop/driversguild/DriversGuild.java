@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
+import com.flowershop.driversguild.dao.OrderDAO;
 import com.flowershop.model.Driver;
 import com.google.gson.Gson;
 import com.jeffrey.server.JHandler;
@@ -14,6 +15,7 @@ import com.jeffrey.server.Response;
 
 public class DriversGuild {
     static DriverDAO driverDAO;
+    static OrderDAO orderDAO;
 
 	public static void main(String[] args) {
 		driverDAO = new DriverDAO();
@@ -26,7 +28,21 @@ public class DriversGuild {
             s.register("/shops", new JHandler() {
                 @Override
                 public Response handle(Request request) {
-                    return new Response(200, request.getURI().toString());
+                    if(request.getMethod().equals("GET")) {
+                        String tail = request.getURI().toString().substring(request.getPath().length());
+                        if(tail.indexOf("/") == 0)
+                            tail = tail.substring(1);
+
+                        String id = tail.substring(0, tail.indexOf("/"));
+                        if(tail.substring(tail.indexOf("/")).equals("/orders")){
+                            Object o = orderDAO.getOrders(id);
+                            if(o == null)
+                                return null;
+                            return new Response(200).send(o);
+                        }
+                        return new Response(400);
+                    }
+                    return new Response(405);
                 }
             });
 
