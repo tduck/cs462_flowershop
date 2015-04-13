@@ -26,7 +26,6 @@ public class DriversGuild {
             s = new JServer(8080);
             s.start();
 
-
             s.register("/shops", new JHandler() {
                 @Override
                 public Response handle(Request request) {
