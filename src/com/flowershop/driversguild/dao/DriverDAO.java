@@ -38,7 +38,7 @@ public class DriverDAO {
           while (rs.next())
           {
         	  Driver driver = new Driver();
-        	  driver.setPhone(rs.getString("number"));
+        	  driver.setPhone(rs.getString("phone"));
         	  driver.setName(rs.getString("name"));
         	  Location location = new Location();
         	  location.setLatitude(rs.getFloat("lastlat"));
@@ -67,7 +67,7 @@ public class DriverDAO {
             {
             	driver = new Driver();
                 driver.setPhone(phone);
-                driver.setName(rs.getString("name"));
+                driver.setName(rs.getString("phone"));
                 Location location = new Location();
                 location.setLatitude(rs.getFloat("lastlat"));
                 location.setLongitude(rs.getFloat("lastlong"));
@@ -89,9 +89,8 @@ public class DriverDAO {
 
     public Driver createDriver(Driver driver){
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://jflowershop.cii4ylx5phxt.us-west-1.rds.amazonaws.com/" +
-                    "flowershop?user=&password=");
-            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.drivers(number, name) VALUES(?, ?)");
+            connection = getConnection();
+            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.drivers(phone, name) VALUES(?, ?)");
             s.setString(1, driver.getPhone());
             s.setString(2, driver.getName());
             s.executeUpdate();
