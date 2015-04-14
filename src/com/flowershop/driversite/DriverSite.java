@@ -274,6 +274,8 @@ public class DriverSite {
                     // TODO send event to driver's guild                   
                     // TODO send event to flower shop website
                 	
+                	System.out.println(ServerUtils.inputStreamToString(r.getBody()));
+                	
                 	try 
                     {
                     	return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
