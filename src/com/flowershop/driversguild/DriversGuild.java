@@ -134,11 +134,13 @@ public class DriversGuild {
 						{
 						     order = gson.fromJson(json.trim(), Order.class);
 						} 
-						catch(Exception e){
+						catch(Exception e)
+						{
 						 	e.printStackTrace();
 						    return new Response(500);
 						}
-						if (orderDAO.setOrderComplete(order) != null)
+						order = orderDAO.setOrderComplete(order);
+						if (order != null)
 						{
 							return new Response(200).pipe(r.getBody());
 						}

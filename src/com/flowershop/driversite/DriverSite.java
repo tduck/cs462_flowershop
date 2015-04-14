@@ -302,6 +302,7 @@ public class DriverSite {
 	                        		
 	                        		Order order = new Order();
 	                        		order.setId(Integer.parseInt(body[1]));
+	                        		order.setDelivered(true);
 	                        		Gson gson = new Gson();
 		                   			String jsonString = gson.toJson(order) + "\n";
 		                   			 
