@@ -86,71 +86,30 @@ public class DriverSite {
                         String query = ServerUtils.inputStreamToString(r.getBody());
                     	Map<String, String> values = ServerUtils.getQueryMap(query);
 
-                        // TODO Add driver to the system.
+                        // Add driver to the system.
                     	if (values.get("phone") != null 
                     			&& values.get("email") != null
                     			&& values.get("first_name") != null
                     			&& values.get("last_name") != null) 
-                    	{
-                        	try
-	                   		{
-                        		Driver driver = new Driver();
-                        		driver.setPhone(values.get("phone"));
-                        		driver.setName(values.get("first_name") + " " + values.get("last_name"));
-                        		driver.setLastLocation(new Location());
-                        		
-								Gson gson = new Gson();
-								String jsonString = gson.toJson(driver);
-								
-								String postURL = driversGuildURL + "/drivers/";
-								URL obj = new URL(postURL);
-								HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-	                       		 
-								con.setRequestMethod("POST");
-								con.setDoOutput(true);
-								con.setRequestProperty("Content-Type", "application/json");
-								 
-								DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-								wr.writeBytes(jsonString);
-								 
-								wr.flush();
-								wr.close();
-	                       		 
-	                       		/* 
-	                       		 	int responseCode = con.getResponseCode();
-		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-		                    		System.out.println("Post parameters : " + query);
-		                    		System.out.println("Response Code : " + responseCode);
-		                     
-		                    		BufferedReader in = new BufferedReader(
-		                    		        new InputStreamReader(con.getInputStream()));
-		                    		String inputLine;
-		                    		StringBuffer response = new StringBuffer();
-		                     
-		                    		while ((inputLine = in.readLine()) != null) {
-		                    			response.append(inputLine);
-		                    		}
-		                    		in.close();
-		                    	
-	                     
-		                    		//print result
-		                    		System.out.println(response.toString());
-	                       		*/
-	                       		 
-								 if (con.getResponseCode() == 200)
-								 {
-									 return new Response(200, "Driver successfully added.");
-								 }
-								 else
-								 {
-									 return new Response(500);
-								 }
-	                   		 } 
-	                   		 catch (IOException e) 
-	                   		 {
-	                   			 e.printStackTrace();
-	                   			 return new Response(500);
-	                   		 }
+                    	{                  	
+                    		Driver driver = new Driver();
+                    		driver.setPhone(values.get("phone"));
+                    		driver.setName(values.get("first_name") + " " + values.get("last_name"));
+                    		driver.setLastLocation(new Location());
+                    		
+							Gson gson = new Gson();
+							String jsonString = gson.toJson(driver);
+							
+							String postURL = driversGuildURL + "/drivers/";
+							int code = ServerUtils.postJson(postURL, jsonString);
+							if (code == 200 || code == 201)
+							{
+								 return new Response(200, "Driver successfully added.");
+							}
+							else
+							{
+								return new Response(code);
+							}
                     	}
                     }                                   	
                     return new Response(200, "Hello world");
@@ -275,7 +234,6 @@ public class DriverSite {
                     	*/
                         // Type 2: Delivery Complete
                         // TODO send event to driver's guild                   
-                        // TODO send event to flower shop website
                     	                	               		
                 		// Parse query string
                         String query = ServerUtils.inputStreamToString(r.getBody());
@@ -287,9 +245,7 @@ public class DriverSite {
                         {
                         	return new Response(400);
                         }
-                        
-                        String driverphone = values.get("From").replaceAll("%2B", "");
-                        
+                                               
                         try
                         {                  	
                         	if (values.get("Body") != null)
@@ -305,41 +261,12 @@ public class DriverSite {
 	                        		order.setDelivered(true);
 	                        		Gson gson = new Gson();
 		                   			String jsonString = gson.toJson(order) + "\n";
-		                   			 
-		                       		URL obj = new URL(postURL);
-		                       		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		                       		
-		                       		con.setRequestMethod("POST");
-		                       		con.setDoOutput(true);
-		                       		con.setRequestProperty("Content-Type", "application/json");
-		                       		 
-		                       		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		                       		wr.writeBytes(jsonString);
-		                      		 
-		                       		wr.flush();
-		                       		wr.close();
-		                       				                       		
-		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-		                    		System.out.println("Post parameters : " + jsonString);
-		                    		
-	                       		 	
-                       		 	 	int responseCode = con.getResponseCode();
-		                    		System.out.println("Response Code : " + responseCode);
-		                     
-		                    		BufferedReader in = new BufferedReader(
-		                    		        new InputStreamReader(con.getInputStream()));
-		                    		String inputLine;
-		                    		StringBuffer response = new StringBuffer();
-		                     
-		                    		while ((inputLine = in.readLine()) != null) {
-		                    			response.append(inputLine);
-		                    		}
-		                    		in.close();			                    	
-	                     
-		                    		//print result
-		                    		System.out.println(response.toString());
-		                    		
-	                        	}
+		                   			
+		                   			int code = ServerUtils.postJson(postURL, jsonString);
+									System.out.println(code);   
+									
+									Twilio.sendMessage(values.get("From").replaceAll("%2B", "+"), "Delivery completion confirmed for order " + order.getId());
+		                       	}
 	                        	
 	                        	else if (values.get("Body").toLowerCase().contains("clock"))
 	                        	{
@@ -354,39 +281,11 @@ public class DriverSite {
 	                        			Gson gson = new Gson();
 	                        			String jsonString = gson.toJson(driver);
 	                        			
-	                        			URL obj = new URL(postURL);
-			                       		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			                       		
-			                       		con.setRequestMethod("POST");
-			                       		con.setDoOutput(true);
-			                       		con.setRequestProperty("Content-Type", "application/json");
-			                       		 
-			                       		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			                       		wr.writeBytes(jsonString);
-			                      		 
-			                       		wr.flush();
-			                       		wr.close();
-			                       				                       		
-			                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-			                    		System.out.println("Post parameters : " + jsonString);
-			                    		
-		                       		 	
-	                       		 	 	int responseCode = con.getResponseCode();
-			                    		System.out.println("Response Code : " + responseCode);
-			                     
-			                    		BufferedReader in = new BufferedReader(
-			                    		        new InputStreamReader(con.getInputStream()));
-			                    		String inputLine;
-			                    		StringBuffer response = new StringBuffer();
-			                     
-			                    		while ((inputLine = in.readLine()) != null) {
-			                    			response.append(inputLine);
-			                    		}
-			                    		in.close();			                    	
-		                     
-			                    		//print result
-			                    		System.out.println(response.toString());
-	                        		}	                    
+	                        			int code = ServerUtils.postJson(postURL, jsonString);
+	        							System.out.println(code);
+	        							
+	        							Twilio.sendMessage("+1" + driver.getPhone(), "Time punch received.");
+	        						}	                    
 	                        	}
 	                        }
 	                        
@@ -397,17 +296,8 @@ public class DriverSite {
                         	return new Response(500);
                         }                        
                 		
-                		try 
-                		{
-							return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
-						} 
-                		catch (FileNotFoundException e) 
-                		{
-							e.printStackTrace();
-							return new Response(500);
-						}
-                		
-        			}
+                		return new Response(200, "<Response/>");	
+                	}
                 	
                 	else try 
                     {

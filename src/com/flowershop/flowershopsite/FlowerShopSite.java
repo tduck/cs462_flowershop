@@ -1,15 +1,11 @@
 package com.flowershop.flowershopsite;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -276,69 +272,28 @@ public class FlowerShopSite {
                     			 && values.get("email") != null
                     			 && values.get("customer_name") != null
                     			 && values.get("address") != null)
-                    	 {
-                    		 try
-                    		 {
-                    			 Order order = new Order();
-                    			 order.setShopid(values.get("shop_id"));
-                    			 order.setAddress(values.get("address") + "," + values.get("city") + "," + values.get("state"));
-                    			 order.setDelivered(false);
-                    			 order.setEmailaddress(values.get("email"));
-                    			 order.setDeliverylocation(new Location());
+                    	 {                    		 
+                			 Order order = new Order();
+                			 order.setShopid(values.get("shop_id"));
+                			 order.setAddress(values.get("address") + "," + values.get("city") + "," + values.get("state"));
+                			 order.setDelivered(false);
+                			 order.setEmailaddress(values.get("email"));
+                			 order.setDeliverylocation(new Location());
                     			                     			 
-                    			 Gson gson = new Gson();
-                    			 String jsonString = gson.toJson(order);
+                			 Gson gson = new Gson();
+                			 String jsonString = gson.toJson(order);
                     			 
-                        		 String postURL = driversGuildURL + "/orders/";
-                        		 URL obj = new URL(postURL);
-                        		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        		 
-                        		 con.setRequestMethod("POST");
-                        		 con.setDoOutput(true);
-                        		 con.setRequestProperty("Content-Type", "application/json");
-                        		 
-                        		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                        		 wr.writeBytes(jsonString);
-                       		 
-                        		 wr.flush();
-                        		 wr.close();
-                        		 
-                        		 /*
-	                       		 	int responseCode = con.getResponseCode();
-		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-		                    		System.out.println("Post parameters : " + jsonString);
-		                    		System.out.println("Response Code : " + responseCode);
-		                     
-		                    		BufferedReader in = new BufferedReader(
-		                    		        new InputStreamReader(con.getInputStream()));
-		                    		String inputLine;
-		                    		StringBuffer response = new StringBuffer();
-		                     
-		                    		while ((inputLine = in.readLine()) != null) {
-		                    			response.append(inputLine);
-		                    		}
-		                    		in.close();
-		                    	
-	                     
-		                    		//print result
-		                    		System.out.println(response.toString());
-	                       		*/
-                        		                         		                        		                         		 							
-								 if (con.getResponseCode() == 200)
-								 {
-									 return new Response(200, "Order placed successfully.");
-								 }
-								 else
-								 {
-									 return new Response(500);
-								 }
-                    		 } 
-                    		 catch (IOException e) 
-                    		 {
-                    			 e.printStackTrace();
-                    			 return new Response(500);
-                    		 }
-                    	 }                        
+                    		 String postURL = driversGuildURL + "/orders/";
+                    		 int code = ServerUtils.postJson(postURL, jsonString);
+ 							 if (code == 200 || code == 201)
+ 							 {
+ 								 return new Response(200, "Order placed successfully.");
+ 							 }
+ 							 else
+ 							 {
+ 								return new Response(code);
+ 							 }              		 
+     					 }                        
                     	 else return new Response(200, "There was an error in processing your order. One or more required fields were not completed.");                       
                      }
                      return new Response(405);
@@ -352,69 +307,27 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try 
-                         {                        	 
-                        	 String query = ServerUtils.inputStreamToString(r.getBody());
-                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
-                        	 System.out.println(values.toString());
-                        	 
-                        	 Order order = new Order();
-                        	 order.setId(Integer.parseInt(values.get("id")));
-                        	 order.setPickedup(true);
-                        	 
-                        	 Gson gson = new Gson();
-                        	 String jsonString = gson.toJson(order);
-                        	
-                        	 // TODO Send event to Drivers' Guild
-                        	 String postURL = driversGuildURL + "/orders/pickup";
-                    		 URL obj = new URL(postURL);
-                    		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                    		 
-                    		 con.setRequestMethod("POST");
-                    		 con.setDoOutput(true);
-                    		 con.setRequestProperty("Content-Type", "application/json");
-                    		 
-                    		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                    		 wr.writeBytes(jsonString);
-                   		 
-                    		 wr.flush();
-                    		 wr.close();
-                    		 
-                    		 
-                       		 	int responseCode = con.getResponseCode();
-	                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
-	                    		System.out.println("Post parameters : " + jsonString);
-	                    		System.out.println("Response Code : " + responseCode);
-	                     
-	                    		BufferedReader in = new BufferedReader(
-	                    		        new InputStreamReader(con.getInputStream()));
-	                    		String inputLine;
-	                    		StringBuffer response = new StringBuffer();
-	                     
-	                    		while ((inputLine = in.readLine()) != null) {
-	                    			response.append(inputLine);
-	                    		}
-	                    		in.close();
-	                    	
-                     
-	                    		//print result
-	                    		System.out.println(response.toString());
-                       		
-                    		                         		                        		                         		 							
-							 if (con.getResponseCode() == 200)
-							 {
-								 return new Response(200, "Order pickup marked successfully.");
-							 }
-							 else
-							 {
-								 return new Response(500);
-							 }
-                         } 
-                         catch (Exception e) 
-                         {
-                             e.printStackTrace();
-                             return new Response(500);
-                         }
+                         String query = ServerUtils.inputStreamToString(r.getBody());
+                    	 Map<String, String> values = ServerUtils.getQueryMap(query);
+                    	 System.out.println(values.toString());
+                    	 
+                    	 Order order = new Order();
+                    	 order.setId(Integer.parseInt(values.get("id")));
+                    	 order.setPickedup(true);
+                    	 
+                    	 Gson gson = new Gson();
+                    	 String jsonString = gson.toJson(order);
+                    	
+                    	 String postURL = driversGuildURL + "/orders/pickup";
+                		 int code = ServerUtils.postJson(postURL, jsonString);
+						 if (code == 200 || code == 201)
+						 {
+							 return new Response(200, "Delivery marked.");
+						 }
+						 else
+						 {
+							return new Response(code);
+						 }                        	
                      }
                      return new Response(405);
                 }
@@ -449,7 +362,7 @@ public class FlowerShopSite {
             
             /*
              * Delivery Complete Event Consumer
-             */
+             *
             s.register("/delivery_complete", new JHandler() {
                 @Override
                 public Response handle(Request r) {
@@ -486,41 +399,7 @@ public class FlowerShopSite {
                      return new Response(405);
                 }
             });
-            */
-            
-            /**
-             * 
-             * LOGGING UTILS
-             * 
-             */
-            s.register("/view_log", new JHandler() {             
-                @Override
-                public Response handle(Request r) {     
-                	try
-                	{
-                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
-                	}
-                	catch (FileNotFoundException e)
-                	{
-                		return new Response(404);
-                	}
-                }
-            });
-            
-            s.register("/clear_log", new JHandler() {             
-                @Override
-                public Response handle(Request r) { 
-                	ServerUtils.clearLog();
-                	try
-                	{
-                		return new Response(200).pipe(new FileInputStream(new File(("log.xml"))));
-                	}
-                	catch (FileNotFoundException e)
-                	{
-                		return new Response(404);
-                	}
-                }
-            });
+            */    
         }
         
         catch (IOException e) {

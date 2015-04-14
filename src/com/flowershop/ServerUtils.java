@@ -3,12 +3,15 @@ package com.flowershop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -89,6 +92,50 @@ public class ServerUtils {
 	    	}
 	    }
 	    return map;
+	}
+	
+	public static int postJson(String postURL, String jsonString)
+	{
+		try
+		{			
+			 URL obj = new URL(postURL);
+			 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			 
+			 con.setRequestMethod("POST");
+			 con.setDoOutput(true);
+			 con.setRequestProperty("Content-Type", "application/json");
+			 
+			 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			 wr.writeBytes(jsonString);
+			 
+			 wr.flush();
+			 wr.close();
+			 			 
+	  		 int responseCode = con.getResponseCode();
+	   		 System.out.println("\nSending 'POST' request to URL : " + postURL);
+	   		 System.out.println("Post parameters : " + jsonString);
+	   		 System.out.println("Response Code : " + responseCode);
+	    
+	   		 BufferedReader in = new BufferedReader(
+	   		        new InputStreamReader(con.getInputStream()));
+	   		 String inputLine;
+	   		 StringBuffer response = new StringBuffer();
+	    
+	   		 while ((inputLine = in.readLine()) != null) {
+	   			 response.append(inputLine);
+	   		 }
+	   		 in.close();	   	
+	
+	   		 //print result
+	   		 System.out.println(response.toString());
+	  				 
+	   		 return responseCode;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return 500;
+		}
 	}
 	
 	public static double GreatCircleDistance(double x1, double y1, double x2, double y2) 

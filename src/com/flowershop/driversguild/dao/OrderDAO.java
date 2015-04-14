@@ -60,7 +60,7 @@ public class OrderDAO {
             s.setString(1, order.getShopid());
             s.setFloat(2, order.getDeliverylocation().getLatitude());
             s.setFloat(3, order.getDeliverylocation().getLongitude());
-            s.setString(4, order.getEmailaddress());
+            s.setString(4, order.getEmailaddress().replaceAll("%40", "@"));
             s.setString(5, order.getDriverphone());
             s.setString(6, order.getAddress());
             s.executeUpdate();
