@@ -149,27 +149,37 @@ public class DriverSite {
 		                       // finally we need to authenticate that authorization code 
 		                       foursquareApi.authenticateCode(code);
 		                       
-		                       CompleteUser user = foursquareApi.user("self").getResult();
+		                       String token = foursquareApi.getOAuthToken();
+		                       System.out.println(token);
 		                       
-		                       Driver driver = new Driver();
-		                       driver.setId(user.getId());
-		                       driver.setName(user.getFirstName() + " " + user.getLastName());
-		                       driver.setPhone(user.getContact().getPhone());
-		                       driver.setAvailable(false);
-		                       driver.setClockedin(false);
+		                       CompleteUser user = foursquareApi.user(null).getResult();
+		                       if (user != null)
+		                       {
 		                       
-		                       fi.foyt.foursquare.api.entities.Checkin[] checkins = foursquareApi.usersCheckins("self", null, null, null, null).getResult().getItems();
-		                       fi.foyt.foursquare.api.entities.Checkin c = checkins[0];
-		                       Location l = new Location();
-		                       l.setLat(c.getLocation().getLat().floatValue());
-		                       l.setLng(c.getLocation().getLng().floatValue());
-		                       driver.setLastLocation(l);
-		                       
-		                       Gson dgson = new Gson();
-		                       String jsonString = dgson.toJson(driver);
-		                       
-		                       System.out.println(jsonString);
-		                       return new Response(200, jsonString);
+			                       Driver driver = new Driver();
+			                       driver.setId(user.getId());
+			                       driver.setName(user.getFirstName() + " " + user.getLastName());
+			                       driver.setPhone(user.getContact().getPhone());
+			                       driver.setAvailable(false);
+			                       driver.setClockedin(false);
+			                       
+			                       fi.foyt.foursquare.api.entities.Checkin[] checkins = foursquareApi.usersCheckins("self", null, null, null, null).getResult().getItems();
+			                       fi.foyt.foursquare.api.entities.Checkin c = checkins[0];
+			                       Location l = new Location();
+			                       l.setLat(c.getLocation().getLat().floatValue());
+			                       l.setLng(c.getLocation().getLng().floatValue());
+			                       driver.setLastLocation(l);
+			                       
+			                       Gson dgson = new Gson();
+			                       String jsonString = dgson.toJson(driver);
+			                       
+			                       System.out.println(jsonString);
+			                       return new Response(200, jsonString);
+		                       }
+		                       else
+		                       {
+		                    	   return new Response(200, "User not found");
+		                       }
 		                       
 		                     } 
 		                     catch (FoursquareApiException e) 
