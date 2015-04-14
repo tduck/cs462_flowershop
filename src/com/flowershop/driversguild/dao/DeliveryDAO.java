@@ -59,8 +59,8 @@ public class DeliveryDAO {
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
 				Location location = new Location();
-				location.setLongitude(rs.getFloat("s.longitude"));
-				location.setLatitude(rs.getFloat("s.latitude"));
+				location.setLng(rs.getFloat("s.longitude"));
+				location.setLat(rs.getFloat("s.latitude"));
 				DeliveryInfo info = new DeliveryInfo();
 				info.setShopLocation(location);
 				info.setOrderId(rs.getInt("o.id"));

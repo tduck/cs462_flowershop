@@ -122,8 +122,8 @@ public class DriverDAO {
             while(rs.next()){
                 Driver driver = new Driver();
                 Location location = new Location();
-                location.setLatitude(rs.getFloat("lastlat"));
-                location.setLongitude(rs.getFloat("lastlong"));
+                location.setLat(rs.getFloat("lastlat"));
+                location.setLng(rs.getFloat("lastlong"));
                 driver.setLastLocation(location);
                 driver.setPhone(rs.getString("phone"));
             }
@@ -184,8 +184,8 @@ public class DriverDAO {
                 double min = Double.MAX_VALUE;
                 Driver best = null;
                 for(Driver driver: drivers){
-                    double m = ServerUtils.GreatCircleDistance(d.getShopLocation().getLatitude(), driver.getLastLocation().getLatitude(),
-                            d.getShopLocation().getLongitude(), driver.getLastLocation().getLongitude());
+                    double m = ServerUtils.GreatCircleDistance(d.getShopLocation().getLat(), driver.getLastLocation().getLat(),
+                            d.getShopLocation().getLng(), driver.getLastLocation().getLng());
                     if(m < min){
                         min = m;
                         best = driver;
