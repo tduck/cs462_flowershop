@@ -345,7 +345,7 @@ public class DriverSite {
 	                        	{
 	                        		String[] messageParts = values.get("Body").toLowerCase().replace('+', ' ').split(" ");
 	                        		Driver driver = new Driver();
-	                        		driver.setPhone(values.get("From"));
+	                        		driver.setPhone(values.get("From").replaceAll("%2B1", ""));
 	                        		if (messageParts[1].equals("in") || messageParts[1].equals("out"))
 	                        		{
 		                        		String postURL = driversGuildURL + "/drivers/clockin";
