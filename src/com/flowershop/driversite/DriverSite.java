@@ -303,7 +303,7 @@ public class DriverSite {
 	                        		Order order = new Order();
 	                        		order.setId(Integer.parseInt(body[1]));
 	                        		Gson gson = new Gson();
-		                   			String jsonString = gson.toJson(order);
+		                   			String jsonString = gson.toJson(order) + "\n";
 		                   			 
 		                       		URL obj = new URL(postURL);
 		                       		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
