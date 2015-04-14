@@ -150,7 +150,6 @@ public class DriverSite {
 		                       foursquareApi.authenticateCode(code);
 		                       
 		                       CompleteUser user = foursquareApi.user("self").getResult();
-		                       System.out.println(user.toString());
 		                       
 		                       Driver driver = new Driver();
 		                       driver.setId(user.getId());
