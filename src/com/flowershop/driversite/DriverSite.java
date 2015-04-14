@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.model.Driver;
@@ -111,10 +114,49 @@ public class DriverSite {
             s.register("/login", new JHandler() 
             {            
             	 @Override
-                 public Response handle(Request r) 
-            	 {            		 
-            		 System.out.println(ServerUtils.inputStreamToString(r.getBody()));
-            		 return new Response(200).pipe(r.getBody());
+                 public Response handle(Request request) 
+            	 {      
+            		 try
+            		 {
+	            		 String tail = request.getURI().toString().substring(request.getPath().length());
+	                     if(tail.indexOf("/") == 0)
+	                         tail = tail.substring(1);
+	                     
+	                     System.out.println(tail);
+	                     String code = tail.replaceAll("?code=", "");
+	                     
+	                     if (!code.equals(""))
+	                     {
+		                     String getURL = "https://foursquare.com/oauth2/access_token"
+		                    	    + "?client_id=Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV"
+		                    	    + "&client_secret=OM4XSTGXFGFKTZP4V0CIALIA4ZOAZNSS25CMYYRNCCUPNXN3"
+		                    	    + "&grant_type=authorization_code"
+		                    	    + "&redirect_uri=https://52.8.41.111/login/"
+		                    	    + "&code=" + code;
+		                     
+		                    
+		                    URL obj = new URL(getURL);
+			               	HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			               		 
+			               	String contents = ServerUtils.inputStreamToString(con.getInputStream());
+	
+		                   	System.out.println("Sending 'GET' request to URL : " + getURL);
+		                   	System.out.println("Results: " + contents);
+		                   	System.out.println("Response Code : " + con.getResponseCode());
+		                     
+		            		return new Response(200, tail);
+	                     }
+	                     
+	                     else
+	                     {
+	                    	 return new Response(500);
+	                     }
+            		 }
+            		 catch (Exception e)
+            		 {
+            			 e.printStackTrace();
+            			 return new Response(500);
+            		 }
             	 }            	
             });
             
