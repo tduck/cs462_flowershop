@@ -51,13 +51,13 @@ public class DriversGuild {
                 @Override
                 public Response handle(Request request) {
                     if(request.getMethod().equals("POST")){
-                        Scanner scanner = new Scanner(request.getBody());
-                        scanner.useDelimiter("\\A");
+                    	String json = ServerUtils.inputStreamToString(request.getBody());
                         Gson gson = new Gson();
                         Driver driver;
                         try {
-                            driver = gson.fromJson(scanner.next(), Driver.class);
+                            driver = gson.fromJson(json, Driver.class);
                         } catch(Exception e){
+                        	e.printStackTrace();
                             return new Response(500);
                         }
                         driver = driverDAO.createDriver(driver);

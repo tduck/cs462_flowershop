@@ -30,6 +30,7 @@ import com.jeffrey.server.Response;
 public class FlowerShopSite {
 	
 	private static String driversGuildURL = "http://52.8.36.38:8080";
+	private static ShopDAO shopDAO;
 	
 	public static void main(String[] args) {
 		
@@ -37,12 +38,13 @@ public class FlowerShopSite {
         try {
             s = new JServer(8080);
             s.start();
+            
+            shopDAO = new ShopDAO();
                        
             s.register("/main", new JHandler() {
                 @Override
                 public Response handle(Request r) {
 
-                	ShopDAO shopDAO = new ShopDAO();                 	 	
 					List<Shop> shops = shopDAO.getShops();
 					if (shops == null)
 					{
@@ -52,7 +54,6 @@ public class FlowerShopSite {
 					String options = "";
 					for (Shop shop : shops)
 					{
-						System.out.println(shop.getID());
 						options += "<option value='" + shop.getID() + "'>" + shop.getName().replace('+', ' ') + "</option>";
 					}
 					
@@ -77,7 +78,6 @@ public class FlowerShopSite {
                     			 && values.get("longitude") != null 
                     			 && Math.abs(Double.parseDouble(values.get("longitude"))) <= 180)
                     	 {
-                    		 ShopDAO shopDAO = new ShopDAO();
                     		 Shop toAdd = new Shop();
                     		 toAdd.setID(flowerShopID);
                     		 toAdd.setName(values.get("location_name"));
@@ -154,9 +154,12 @@ public class FlowerShopSite {
                      		{
                      			return new Response(500);
                      		}
+                     		
+                 			table += "<table><tr><th>Driver Phone</th></tr>";
+
                      		for (Delivery delivery : deliveries)
-                     		{
-                     			table += "<tr>" + "</tr>";
+                     		{                     			
+                     			table += "<tr><td>" + delivery.getDriverphone() + "</td></tr></table>";
                      		}
                      		
                      		table += "</tr>";
@@ -168,7 +171,6 @@ public class FlowerShopSite {
                      }
                      else 
                      {
-                    	 ShopDAO shopDAO = new ShopDAO();
                     	 List<Shop> shops = shopDAO.getShops();
                     	 if (shops == null)
                     	 {
@@ -200,9 +202,7 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                                                 	
-                    	 String orderID = UUID.randomUUID().toString().replaceAll("-", "");
-                    	
+                                                 	                    	
                     	 String query = ServerUtils.inputStreamToString(r.getBody());
                     	 Map<String, String> values = ServerUtils.getQueryMap(query);
                     	 System.out.println(values.toString());
@@ -261,8 +261,7 @@ public class FlowerShopSite {
                         		                         		                        		                         		 							
 								 if (con.getResponseCode() == 200)
 								 {
-									 return new Response(200, "Order placed successfully. Your order ID is " + 
-                                		orderID + ".");
+									 return new Response(200, "Order placed successfully.");
 								 }
 								 else
 								 {

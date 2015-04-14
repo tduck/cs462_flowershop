@@ -73,8 +73,6 @@ public class DriverSite {
             s = new JServer(8080);
             s.start();
                                     
-            // TODO Setup DB
-            
             s.register("/home", new WebsiteHandler("web/driver_site"));
             
             // Add new driver
