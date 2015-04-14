@@ -17,6 +17,8 @@ import java.util.UUID;
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.model.Driver;
+import com.flowershop.model.Location;
+import com.google.gson.Gson;
 import com.jeffrey.server.*;
 
 import org.apache.http.NameValuePair;
@@ -80,31 +82,40 @@ public class DriverSite {
                 @Override
                 public Response handle(Request r) {
                     if(r.getMethod().equals("POST"))
-                    {                        	
-                    	String driverID = UUID.randomUUID().toString().replaceAll("-", "");
-                    	
+                    {                        	                   	
                     	// Parse query string
                         String query = ServerUtils.inputStreamToString(r.getBody());
                     	Map<String, String> values = ServerUtils.getQueryMap(query);
 
                         // TODO Add driver to the system.
-                    	if (values.get("phone") != null && values.get("email") != null) 
+                    	if (values.get("phone") != null 
+                    			&& values.get("email") != null
+                    			&& values.get("first_name") != null
+                    			&& values.get("last_name") != null) 
                     	{
                         	try
 	                   		{
-	                   			 query += "&driver_id=" + driverID;
-	                       		 String postURL = driversGuildURL + "/drivers/";
-	                       		 URL obj = new URL(postURL);
-	                       		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                        		Driver driver = new Driver();
+                        		driver.setPhone(values.get("phone"));
+                        		driver.setName(values.get("first_name") + " " + values.get("last_name"));
+                        		driver.setLastLocation(new Location());
+                        		
+								Gson gson = new Gson();
+								String jsonString = gson.toJson(driver);
+								
+								String postURL = driversGuildURL + "/drivers/";
+								URL obj = new URL(postURL);
+								HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 	                       		 
-	                       		 con.setRequestMethod("POST");
-	                       		 con.setDoOutput(true);
-	                       		 
-	                       		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-	                       		 wr.writeBytes(query);
-	                       		 
-	                       		 wr.flush();
-	                       		 wr.close();
+								con.setRequestMethod("POST");
+								con.setDoOutput(true);
+								con.setRequestProperty("Content-Type", "application/json");
+								 
+								DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+								wr.writeBytes(jsonString);
+								 
+								wr.flush();
+								wr.close();
 	                       		 
 	                       		/* 
 	                       		 	int responseCode = con.getResponseCode();
@@ -129,8 +140,7 @@ public class DriverSite {
 	                       		 
 								 if (con.getResponseCode() == 200)
 								 {
-									 return new Response(200, "Driver successfully added with ID " + 
-											 driverID + ".");
+									 return new Response(200, "Driver successfully added.");
 								 }
 								 else
 								 {
