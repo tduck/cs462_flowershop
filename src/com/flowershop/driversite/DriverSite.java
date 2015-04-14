@@ -182,9 +182,7 @@ public class DriverSite {
 		                     {
 		                      // TODO: Error handling
 		                    	 return new Response(500);
-		                     } 
-		                     
-		            		 return new Response(200, tail);
+		                     } 	                     
 	                     }
 	                     
 	                     else
