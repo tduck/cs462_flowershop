@@ -123,12 +123,12 @@ public class DriverSite {
 	                         tail = tail.substring(1);
 	                     
 	                     System.out.println(tail);
-	                     String code = tail.replaceAll("?code=", "");
+	                     String code = tail.replaceAll("\\Q?\\Ecode=", "");
 	                     
 	                     if (!code.equals(""))
 	                     {
 		                     String getURL = "https://foursquare.com/oauth2/access_token"
-		                    	    + "\\Q?\\Eclient_id=Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV"
+		                    	    + "?client_id=Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV"
 		                    	    + "&client_secret=OM4XSTGXFGFKTZP4V0CIALIA4ZOAZNSS25CMYYRNCCUPNXN3"
 		                    	    + "&grant_type=authorization_code"
 		                    	    + "&redirect_uri=https://52.8.41.111/login/"
