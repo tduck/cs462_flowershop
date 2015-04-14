@@ -71,8 +71,8 @@ public class DriverSite {
 	public static void main(String[] args) {
 		JServer s;
         try {
-            s = new JServer(8080);
-            s.start();
+			s = new JServer(443, "https", System.getenv("keystorelocation"), System.getenv("keystorepassword"));
+			s.start();
                                     
             s.register("/home", new WebsiteHandler("web/driver_site"));
             
