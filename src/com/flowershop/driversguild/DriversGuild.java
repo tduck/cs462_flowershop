@@ -130,7 +130,8 @@ public class DriversGuild {
 						String json = ServerUtils.inputStreamToString(r.getBody());
 						Gson gson = new Gson();
 						Order order;
-						try {
+						try 
+						{
 						     order = gson.fromJson(json.trim(), Order.class);
 						} 
 						catch(Exception e){
@@ -139,10 +140,11 @@ public class DriversGuild {
 						}
 						if (orderDAO.setOrderComplete(order.getId(), order.isDelivered()))
 						{
-							return new Response(200, json);
+							return new Response(200).pipe(r.getBody());
 						}
 						else 
 						{
+							System.out.println("500 section");
 						    return new Response(500);
 						}
 					}

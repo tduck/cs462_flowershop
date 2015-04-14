@@ -85,6 +85,7 @@ public class OrderDAO {
 	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET delivered = ? WHERE id = ?");
 	        s.setBoolean(1, b); 
 	        s.setInt(2, i);
+	        System.out.println(s.toString());
 	        s.executeUpdate();
 	        connection.close();	        
 	        return true;

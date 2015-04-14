@@ -321,22 +321,23 @@ public class DriverSite {
 		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
 		                    		System.out.println("Post parameters : " + jsonString);
 		                    		
-	                       		 	int responseCode = con.getResponseCode();
-		                    		System.out.println("Response Code : " + responseCode);
+	                       		 	/* 
+	                       		 	 	int responseCode = con.getResponseCode();
+			                    		System.out.println("Response Code : " + responseCode);
+			                     
+			                    		BufferedReader in = new BufferedReader(
+			                    		        new InputStreamReader(con.getInputStream()));
+			                    		String inputLine;
+			                    		StringBuffer response = new StringBuffer();
+			                     
+			                    		while ((inputLine = in.readLine()) != null) {
+			                    			response.append(inputLine);
+			                    		}
+			                    		in.close();			                    	
 		                     
-		                    		BufferedReader in = new BufferedReader(
-		                    		        new InputStreamReader(con.getInputStream()));
-		                    		String inputLine;
-		                    		StringBuffer response = new StringBuffer();
-		                     
-		                    		while ((inputLine = in.readLine()) != null) {
-		                    			response.append(inputLine);
-		                    		}
-		                    		in.close();
-		                    	
-	                     
-		                    		//print result
-		                    		System.out.println(response.toString());
+			                    		//print result
+			                    		System.out.println(response.toString());
+		                    		*/
 	                        	}
 	                        	
 	                        	else if (values.get("Body").toLowerCase().contains("delivered"))
