@@ -76,24 +76,24 @@ public class OrderDAO {
         }
     }
     
-    public boolean setOrderComplete(int i, boolean b)
+    public Order setOrderComplete(Order order)
     {
         try 
         {
 			connection = getConnection();
 	        connection.setAutoCommit(false);
 	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET delivered = ? WHERE id = ?");
-	        s.setBoolean(1, b); 
-	        s.setInt(2, i);
+	        s.setBoolean(1, order.isDelivered()); 
+	        s.setInt(2, order.getId());
 	        System.out.println(s.toString());
 	        s.executeUpdate();
 	        connection.close();	        
-	        return true;
+	        return order;
         } 
         catch (SQLException e) 
         {
 			e.printStackTrace();
-			return false;
+			return null;
 		}
     }
 }

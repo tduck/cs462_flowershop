@@ -123,10 +123,10 @@ public class DriversGuild {
             
             s.register("/orders/complete", new JHandler() {
             	@Override
-                public Response handle(Request r) {
-                     if(r.getMethod().equals("POST")){
-						System.out.println(ServerUtils.inputStreamToString(r.getBody()));
-						
+                public Response handle(Request r) 
+            	{
+                     if(r.getMethod().equals("POST"))
+                     {					
 						String json = ServerUtils.inputStreamToString(r.getBody());
 						Gson gson = new Gson();
 						Order order;
@@ -138,13 +138,12 @@ public class DriversGuild {
 						 	e.printStackTrace();
 						    return new Response(500);
 						}
-						if (orderDAO.setOrderComplete(order.getId(), order.isDelivered()))
+						if (orderDAO.setOrderComplete(order) != null)
 						{
 							return new Response(200).pipe(r.getBody());
 						}
 						else 
 						{
-							System.out.println("500 section");
 						    return new Response(500);
 						}
 					}
