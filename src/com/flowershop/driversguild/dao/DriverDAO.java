@@ -123,7 +123,7 @@ public class DriverDAO {
         List<Driver> drivers = new ArrayList<>();
         try{
             PreparedStatement s = connection.prepareStatement("SELECT * FROM flowershop.drivers" +
-                    " WHERE available = true AND lastlat NOT IS NULL");
+                    " WHERE available = true AND lastlat IS NOT NULL");
             ResultSet rs = s.executeQuery();
             while(rs.next()){
                 Driver driver = new Driver();
