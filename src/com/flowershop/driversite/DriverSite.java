@@ -130,14 +130,7 @@ public class DriverSite {
 	                     String code = tail.replaceAll("\\Q?\\Ecode=", "");
 	                     
 	                     if (!code.equals(""))
-	                     {
-		                     String getURL = "https://foursquare.com/oauth2/access_token"
-		                    	    + "?client_id=Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV"
-		                    	    + "&client_secret=OM4XSTGXFGFKTZP4V0CIALIA4ZOAZNSS25CMYYRNCCUPNXN3"
-		                    	    + "&grant_type=authorization_code"
-		                    	    + "&redirect_uri=https://52.8.41.111/login/"
-		                    	    + "&code=" + code;
-		                     
+	                     {                     
 		                     FoursquareApi foursquareApi = new FoursquareApi(
 		                    		 "Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV", 
 		                    		 "OM4XSTGXFGFKTZP4V0CIALIA4ZOAZNSS25CMYYRNCCUPNXN3", 
@@ -147,15 +140,15 @@ public class DriverSite {
 		                     try 
 		                     {
 		                       // finally we need to authenticate that authorization code 
+		                       foursquareApi.setUseCallback(false);
 		                       foursquareApi.authenticateCode(code);
 		                       
 		                       String token = foursquareApi.getOAuthToken();
 		                       System.out.println(token);
-		                       
+		                       		                       
 		                       CompleteUser user = foursquareApi.user(null).getResult();
 		                       if (user != null)
-		                       {
-		                       
+		                       {		                       
 			                       Driver driver = new Driver();
 			                       driver.setId(user.getId());
 			                       driver.setName(user.getFirstName() + " " + user.getLastName());
