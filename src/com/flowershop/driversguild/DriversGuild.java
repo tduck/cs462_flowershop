@@ -139,11 +139,11 @@ public class DriversGuild {
 						}
 						if (orderDAO.setOrderComplete(order.getId(), order.isDelivered()))
 						{
-							return new Response(201).send(order);
+							return new Response(200, json);
 						}
 						else 
 						{
-						     return new Response(500);
+						    return new Response(500);
 						}
 					}
 					return new Response(405);

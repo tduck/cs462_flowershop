@@ -317,11 +317,11 @@ public class DriverSite {
 		                      		 
 		                       		wr.flush();
 		                       		wr.close();
-		                       		
-		                       		
-	                       		 	int responseCode = con.getResponseCode();
+		                       				                       		
 		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
 		                    		System.out.println("Post parameters : " + jsonString);
+		                    		
+	                       		 	int responseCode = con.getResponseCode();
 		                    		System.out.println("Response Code : " + responseCode);
 		                     
 		                    		BufferedReader in = new BufferedReader(
