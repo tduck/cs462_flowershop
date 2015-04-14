@@ -209,8 +209,9 @@ public class DriverDAO {
 
     public void assign(Driver d, DeliveryInfo i){
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE flowershop.deliveries SET driverphone = ?");
-            ps.setString(1, d.getPhone());
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO flowershop.deliveries (orderid, driverphone, accepted) VALUES (?,?,0)");
+            ps.setInt(1, i.getOrderId());
+            ps.setString(2, d.getPhone());
             ps.executeUpdate();
             Twilio.sendMessage("+1" + d.getPhone(), "Would you like to accept a delivery from " + String.valueOf(i.getShopLocation().getLat()) + ", "
             + String.valueOf(i.getShopLocation().getLng()) + "? Respond with an accept message and the id " + String.valueOf(i.getOrderId()) + " to accept.");
