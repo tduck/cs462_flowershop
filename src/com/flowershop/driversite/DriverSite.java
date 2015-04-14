@@ -102,6 +102,15 @@ public class DriverSite {
 		}
 	}
 	
+	private static class Access {
+	
+		private String accesscode;
+		
+		public String getAccesscode() {
+			return accesscode;
+		}
+	}
+	
 	public static void main(String[] args) {
 		JServer s;
         try {
@@ -138,12 +147,22 @@ public class DriverSite {
 		                    URL obj = new URL(getURL);
 			               	HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			               		 
+			               	if (con.getResponseCode() != 200)
+			               	{
+			               		return new Response(400);
+			               	}
+			               	
 			               	String contents = ServerUtils.inputStreamToString(con.getInputStream());
 	
 		                   	System.out.println("Sending 'GET' request to URL : " + getURL);
 		                   	System.out.println("Results: " + contents);
 		                   	System.out.println("Response Code : " + con.getResponseCode());
 		                     
+		                   	Gson gson = new Gson();
+		                   	Access access = gson.fromJson(contents, Access.class);
+		                   	
+		                   	System.out.println(access.getAccesscode());
+		                   	
 		            		return new Response(200, tail);
 	                     }
 	                     
