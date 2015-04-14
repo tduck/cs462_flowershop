@@ -267,14 +267,31 @@ public class DriverSite {
                 @Override
                 public Response handle(Request r) {
                 	
-                	/*
-                	 * type 1: Bid Available
-                	*/
-                    // Type 2: Delivery Complete
-                    // TODO send event to driver's guild                   
-                    // TODO send event to flower shop website
-                	                	
-                	try 
+                	if (r.getMethod().equals("POST"))
+        			{
+                		/*
+                    	 * type 1: Bid Available
+                    	*/
+                        // Type 2: Delivery Complete
+                        // TODO send event to driver's guild                   
+                        // TODO send event to flower shop website
+                    	                	
+                		System.out.println(ServerUtils.inputStreamToString(r.getBody()));
+                		
+                		
+                		
+                		try {
+							return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
+						} 
+                		catch (FileNotFoundException e) 
+                		{
+							e.printStackTrace();
+							return new Response(500);
+						}
+                		
+        			}
+                	
+                	else try 
                     {
                     	return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
                     } 
