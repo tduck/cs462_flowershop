@@ -296,7 +296,7 @@ public class DriverSite {
 	                        {
 	                        	if (values.get("Body").toLowerCase().contains("delivered"))
 	                        	{
-	                        		String[] body = values.get("Body").split(" ");
+	                        		String[] body = values.get("Body").replace('+', ' ').split(" ");
 	                        		
 	                        		String postURL = driversGuildURL + "/orders/complete";
 	                        		
