@@ -130,11 +130,13 @@ public class DriversGuild {
                         	 
                         	 // Parse query string
                         	 String query = ServerUtils.inputStreamToString(r.getBody());
-                         	 Map<String, String> values = ServerUtils.getQueryMap(query);
-
-                        	 if (values.get("id") != null && values.get("delivered") != null)
+                        	 Gson gson = new Gson();
+                        	 
+                        	 Order order = gson.fromJson(query, Order.class);
+                        	 
+                        	 if (order.getId() != -1 && order.isDelivered())
                         	 {
-                            	 orderDAO.setOrderComplete(values.get("id"), values.get("delivered"));
+                            	 orderDAO.setOrderComplete(order.getId(), order.isDelivered());
                         	 }
                         	 
                         	 return new Response(200).pipe(r.getBody());
