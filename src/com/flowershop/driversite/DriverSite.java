@@ -147,11 +147,12 @@ public class DriverSite {
 		                       String token = foursquareApi.getOAuthToken();
 		                       System.out.println(token);
 		                       		                       
-		                       Result<CompleteUser> user = foursquareApi.user(null);
-		                       String error = user.getMeta().getErrorDetail();
+		                       Result<CompleteUser> userResult = foursquareApi.user(null);
+		                       String error = userResult.getMeta().getErrorDetail();
 		                       
-		                       if (user != null)
-		                       {		                       
+		                       if (userResult.getResult() != null)
+		                       {		   
+		                    	   CompleteUser user = userResult.getResult();
 			                       Driver driver = new Driver();
 			                       driver.setId(user.getId());
 			                       driver.setName(user.getFirstName() + " " + user.getLastName());
