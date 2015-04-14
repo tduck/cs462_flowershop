@@ -343,7 +343,7 @@ public class DriverSite {
 	                        	
 	                        	else if (values.get("Body").toLowerCase().contains("clock"))
 	                        	{
-	                        		String[] messageParts = values.get("Body").toLowerCase().split("+");
+	                        		String[] messageParts = values.get("Body").toLowerCase().replace('+', ' ').split(" ");
 	                        		Driver driver = new Driver();
 	                        		driver.setPhone(values.get("From"));
 	                        		if (messageParts[1].equals("in") || messageParts[1].equals("out"))
