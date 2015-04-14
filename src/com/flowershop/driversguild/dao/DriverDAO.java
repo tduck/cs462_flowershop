@@ -1,9 +1,8 @@
 package com.flowershop.driversguild.dao;
 
-import com.flowershop.model.Driver;
-import com.flowershop.model.Location;
-import com.flowershop.model.Order;
-import com.flowershop.model.Shop;
+import com.flowershop.ServerUtils;
+import com.flowershop.driversguild.DriversGuild;
+import com.flowershop.model.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,6 +18,7 @@ import java.util.List;
 public class DriverDAO {
     
 	Connection connection;
+    DeliveryDAO deliveryDAO = new DeliveryDAO();
     
 	public DriverDAO() {}
 	
@@ -113,6 +113,26 @@ public class DriverDAO {
         }
 	}
 
+    public List<Driver> getAvailableDrivers(Connection connection){
+        List<Driver> drivers = new ArrayList<>();
+        try{
+            PreparedStatement s = connection.prepareStatement("SELECT * FROM flowershop.drivers" +
+                    " WHERE available = true AND lastlat NOT IS NULL");
+            ResultSet rs = s.executeQuery();
+            while(rs.next()){
+                Driver driver = new Driver();
+                Location location = new Location();
+                location.setLatitude(rs.getFloat("lastlat"));
+                location.setLongitude(rs.getFloat("lastlong"));
+                driver.setLastLocation(location);
+                driver.setPhone(rs.getString("phone"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return drivers;
+    }
+
     public Driver createDriver(Driver driver){
         try {
             connection = getConnection();
@@ -125,6 +145,7 @@ public class DriverDAO {
             s.setBoolean(6, driver.isClockedin());
             s.executeUpdate();
             connection.close();
+            DriversGuild.flagChanged();
             return driver;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -143,6 +164,7 @@ public class DriverDAO {
             s.setString(3, driver.getPhone());
             s.executeUpdate();
             connection.close();
+            DriversGuild.flagChanged();
             return driver;
         } 
     	catch (SQLException e) 
@@ -150,5 +172,37 @@ public class DriverDAO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void assignDrivers() {
+        try {
+            connection = getConnection();
+            List<DeliveryInfo> info = deliveryDAO.getUndeliveredOrders(connection);
+            List<Driver> drivers = getAvailableDrivers(connection);
+
+            for(DeliveryInfo d: info){
+                double min = Double.MAX_VALUE;
+                Driver best = null;
+                for(Driver driver: drivers){
+                    double m = ServerUtils.GreatCircleDistance(d.getShopLocation().getLatitude(), driver.getLastLocation().getLatitude(),
+                            d.getShopLocation().getLongitude(), driver.getLastLocation().getLongitude());
+                    if(m < min){
+                        min = m;
+                        best = driver;
+                    }
+                }
+                drivers.remove(best);
+                assign(best, d);
+            }
+
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void assign(Driver d, DeliveryInfo i){
+        //TODO: Send a message to d asking to assign i, use connection?
+        return;
     }
 }

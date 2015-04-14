@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.flowershop.model.Delivery;
+import com.flowershop.model.DeliveryInfo;
+import com.flowershop.model.Location;
 
 public class DeliveryDAO {
 	
@@ -46,6 +48,29 @@ public class DeliveryDAO {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	String undeliveredSql = "SELECT * FROM flowershop.deliveries d, flowershop.orders o, flowershop.shops s " +
+			"WHERE d.driverphone IS NULL AND o.id = d.orderid AND s.id = o.shopid";
+	public List<DeliveryInfo> getUndeliveredOrders(Connection connection) {
+		List<DeliveryInfo> deliveries = new ArrayList<>();
+		try {
+			PreparedStatement ps = connection.prepareStatement(undeliveredSql);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				Location location = new Location();
+				location.setLongitude(rs.getFloat("s.longitude"));
+				location.setLatitude(rs.getFloat("s.latitude"));
+				DeliveryInfo info = new DeliveryInfo();
+				info.setShopLocation(location);
+				info.setOrderId(rs.getInt("o.id"));
+				deliveries.add(info);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return deliveries;
 	}
 
 }
