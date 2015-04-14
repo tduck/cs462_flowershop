@@ -50,7 +50,7 @@ public class DeliveryDAO {
 		}
 	}
 
-	String undeliveredSql = "SELECT * FROM flowershop.deliveries d, flowershop.orders o, flowershop.shops s " +
+	String undeliveredSql = "SELECT s.longitude, s.latitude, d.orderid, d.id FROM flowershop.deliveries d, flowershop.orders o, flowershop.shops s " +
 			"WHERE d.driverphone IS NULL AND o.id = d.orderid AND s.id = o.shopid";
 	public List<DeliveryInfo> getUndeliveredOrders(Connection connection) {
 		List<DeliveryInfo> deliveries = new ArrayList<>();
@@ -59,11 +59,12 @@ public class DeliveryDAO {
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
 				Location location = new Location();
-				location.setLng(rs.getFloat("s.longitude"));
-				location.setLat(rs.getFloat("s.latitude"));
+				location.setLng(rs.getFloat("longitude"));
+				location.setLat(rs.getFloat("latitude"));
 				DeliveryInfo info = new DeliveryInfo();
 				info.setShopLocation(location);
-				info.setOrderId(rs.getInt("o.id"));
+				info.setOrderId(rs.getInt("orderid"));
+				info.setId(rs.getInt("id"));
 				deliveries.add(info);
 			}
 		} catch (SQLException e) {

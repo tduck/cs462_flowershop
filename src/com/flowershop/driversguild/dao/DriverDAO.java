@@ -3,6 +3,12 @@ package com.flowershop.driversguild.dao;
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.DriversGuild;
 import com.flowershop.model.*;
+import com.twilio.sdk.TwilioRestClient;
+import com.twilio.sdk.TwilioRestException;
+import com.twilio.sdk.resource.factory.MessageFactory;
+import com.twilio.sdk.resource.instance.Message;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -202,7 +208,47 @@ public class DriverDAO {
     }
 
     public void assign(Driver d, DeliveryInfo i){
-        //TODO: Send a message to d asking to assign i, use connection?
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE flowershop.deliveries SET driverphone = ?");
+            ps.setString(1, d.getPhone());
+            ps.executeUpdate();
+            Twilio.sendMessage("+1" + d.getPhone(), "Would you like to accept a delivery from " + String.valueOf(i.getShopLocation().getLat()) + ", "
+            + String.valueOf(i.getShopLocation().getLng()) + "? Respond with an accept message and the id " + String.valueOf(i.getOrderId()) + " to accept.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return;
+    }
+
+    private static class Twilio {
+
+        private final static String ACCOUNT_SID = "AC15f0c7bd26137ed319deffa2022b84cb";
+        private final static String AUTH_TOKEN = "1eba8cbc1c6de15ad1c454b55f3aebf3";
+        /*
+         * Used in Twilio SMS event generation
+         */
+        public static void sendMessage(String phone, String body)
+        {
+            try
+            {
+                TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
+
+                // Build a filter for the MessageList
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("Body", body));
+                params.add(new BasicNameValuePair("To", phone));
+                params.add(new BasicNameValuePair("From", "+13852194380"));
+
+                MessageFactory messageFactory = client.getAccount().getMessageFactory();
+                Message message = messageFactory.create(params);
+                System.out.println(message.getSid());
+
+            }
+            catch (TwilioRestException e)
+            {
+                e.printStackTrace();
+                ServerUtils.addToLog(e.getErrorMessage());
+            }
+        }
     }
 }
