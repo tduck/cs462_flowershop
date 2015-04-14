@@ -125,26 +125,28 @@ public class DriversGuild {
             	@Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try {
-                        	 System.out.println(ServerUtils.inputStreamToString(r.getBody()));
-                        	 
-                        	 // Parse query string
-                        	 String query = ServerUtils.inputStreamToString(r.getBody());
-                        	 Gson gson = new Gson();
-                        	 
-                        	 Order order = gson.fromJson(query, Order.class);
-                        	 
-                        	 if (order.getId() != -1 && order.isDelivered())
-                        	 {
-                            	 orderDAO.setOrderComplete(order.getId(), order.isDelivered());
-                        	 }
-                        	 
-                        	 return new Response(200).pipe(r.getBody());
-                         } catch (Exception e) {
-                             e.printStackTrace();
-                         }
-                     }
-                     return new Response(405);
+						System.out.println(ServerUtils.inputStreamToString(r.getBody()));
+						
+						String json = ServerUtils.inputStreamToString(r.getBody());
+						Gson gson = new Gson();
+						Order order;
+						try {
+						     order = gson.fromJson(json.trim(), Order.class);
+						} 
+						catch(Exception e){
+						 	e.printStackTrace();
+						    return new Response(500);
+						}
+						if (orderDAO.setOrderComplete(order.getId(), order.isDelivered()))
+						{
+							return new Response(201).send(order);
+						}
+						else 
+						{
+						     return new Response(500);
+						}
+					}
+					return new Response(405);
                 }
             });
                        
