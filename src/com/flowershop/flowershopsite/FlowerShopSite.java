@@ -125,50 +125,58 @@ public class FlowerShopSite {
                      	String shopID = values.get("location");
                      	
                         // TODO Retrieve available bids for orders at the given flower shop location
-                     	OrderDAO orderDAO = new OrderDAO();
-                     	DeliveryDAO deliveryDAO = new DeliveryDAO();
-                     	
-                     	List<Order> orders = orderDAO.getOrders(shopID);
-                     	if (orders == null)
-                     	{
-                     		return new Response(500);
-                     	}
-                     	
-//                     	System.out.println(shopID);
-                     	
-                     	String content = ServerUtils.getFileContents("web/flower_shop/admin.html");
-                     	String table = "<table><tr><th>ID</th>"
-                     			+ "<th>Delivery Address</th>"
-                     			+ "<th>Customer Email</th>"
-                     			+ "<th></th></tr>";
-                     	for (Order order : orders)
-                     	{
-                     		table += "<tr><td>" + order.getId() + "</td>";
-                     		table += "<td>" + order.getAddress() + "</td>";
-                     		table += "<td>" + order.getEmailaddress() + "</td>";
-                     		table += "<td><form action='' method='POST'>" + "<input type='submit'></form></td></tr>";
-                     		
-                     		table += "<tr>";
-                     		List<Delivery> deliveries = deliveryDAO.getDeliveries(order.getId());
-                     		if (deliveries == null)
-                     		{
-                     			return new Response(500);
-                     		}
-                     		
-                 			table += "<table><tr><th>Driver Phone</th></tr>";
 
-                     		for (Delivery delivery : deliveries)
-                     		{                     			
-                     			table += "<tr><td>" + delivery.getDriverphone() + "</td></tr></table>";
-                     		}
-                     		
-                     		table += "</tr>";
-                     	}
-                     	table += "</table>";
+                     	String getURL = driversGuildURL + "/shops/:" + shopID + "/orders";
                      	
-                     	return new Response(200, content.replaceAll("<table></table>", table));
-                 		                     	
-                     }
+ 	                	try
+                     	{
+	                     	URL obj = new URL(getURL);
+		               		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		               		 
+		               		String contents = ServerUtils.inputStreamToString(con.getInputStream());
+		              		 
+ 	                   		System.out.println("\nSending 'GET' request to URL : " + getURL);
+	                   		System.out.println("results: " + contents);
+	                   		System.out.println("Response Code : " + con.getResponseCode());
+	                   		
+	                   		String content = ServerUtils.getFileContents("web/flower_shop/admin.html");
+	                     	String table = "<table><tr><th>ID</th>"
+	                     			+ "<th>Delivery Address</th>"
+	                     			+ "<th>Customer Email</th>"
+	                     			+ "<th></th></tr>";
+//	                     	for (Order order : orders)
+//	                     	{
+//	                     		table += "<tr><td>" + order.getId() + "</td>";
+//	                     		table += "<td>" + order.getAddress() + "</td>";
+//	                     		table += "<td>" + order.getEmailaddress() + "</td>";
+//	                     		table += "<td><form action='' method='POST'>" + "<input type='submit'></form></td></tr>";
+//	                     		
+//	                     		table += "<tr>";
+//	                     		List<Delivery> deliveries = deliveryDAO.getDeliveries(order.getId());
+//	                     		if (deliveries == null)
+//	                     		{
+//	                     			return new Response(500);
+//	                     		}
+//	                     		
+//	                 			table += "<table><tr><th>Driver Phone</th></tr>";
+//
+//	                     		for (Delivery delivery : deliveries)
+//	                     		{                     			
+//	                     			table += "<tr><td>" + delivery.getDriverphone() + "</td></tr></table>";
+//	                     		}
+//	                     		
+//	                     		table += "</tr>";
+//	                     	}
+	                     	table += "</table>";
+	                     	
+	                     	return new Response(200, content.replaceAll("<table></table>", table));
+	                    }
+                     	catch (Exception e)
+                     	{
+                     		e.printStackTrace();
+                     		return new Response(500);
+                     	}               		 
+               		 }
                      else 
                      {
                     	 List<Shop> shops = shopDAO.getShops();
