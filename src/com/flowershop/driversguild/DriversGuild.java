@@ -142,7 +142,7 @@ public class DriversGuild {
 						order = orderDAO.setOrderComplete(order);
 						if (order != null)
 						{
-							return new Response(200).pipe(r.getBody());
+							return new Response(200, json);
 						}
 						else 
 						{

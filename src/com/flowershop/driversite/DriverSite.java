@@ -322,7 +322,7 @@ public class DriverSite {
 		                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
 		                    		System.out.println("Post parameters : " + jsonString);
 		                    		
-	                       		 	/* 
+	                       		 	
 	                       		 	 	int responseCode = con.getResponseCode();
 			                    		System.out.println("Response Code : " + responseCode);
 			                     
@@ -338,7 +338,7 @@ public class DriverSite {
 		                     
 			                    		//print result
 			                    		System.out.println(response.toString());
-		                    		*/
+		                    		
 	                        	}
 	                        	
 	                        	else if (values.get("Body").toLowerCase().contains("delivered"))
