@@ -185,6 +185,38 @@ public class DriversGuild {
 					return new Response(405);
                 }
             });
+            
+            s.register("/orders/pickup", new JHandler() {
+            	@Override
+                public Response handle(Request r) 
+            	{
+                     if(r.getMethod().equals("POST"))
+                     {					
+						String json = ServerUtils.inputStreamToString(r.getBody());
+						Gson gson = new Gson();
+						Order order;
+						try 
+						{
+						     order = gson.fromJson(json.trim(), Order.class);
+						} 
+						catch(Exception e)
+						{
+						 	e.printStackTrace();
+						    return new Response(500);
+						}
+						order = orderDAO.pickupOrder(order);
+						if (order != null)
+						{
+							return new Response(200, json);
+						}
+						else 
+						{
+						    return new Response(500);
+						}
+					}
+					return new Response(405);
+                }
+            });
                        
             /*s.register("/main", new JHandler() {
                 @Override
