@@ -26,6 +26,7 @@ import com.twilio.sdk.resource.instance.Message;
 
 import fi.foyt.foursquare.api.FoursquareApi;
 import fi.foyt.foursquare.api.FoursquareApiException;
+import fi.foyt.foursquare.api.Result;
 import fi.foyt.foursquare.api.entities.CompleteUser;
 
 public class DriverSite {
@@ -146,7 +147,9 @@ public class DriverSite {
 		                       String token = foursquareApi.getOAuthToken();
 		                       System.out.println(token);
 		                       		                       
-		                       CompleteUser user = foursquareApi.user(null).getResult();
+		                       Result<CompleteUser> user = foursquareApi.user(null);
+		                       String error = user.getMeta().getErrorDetail();
+		                       
 		                       if (user != null)
 		                       {		                       
 			                       Driver driver = new Driver();
@@ -171,7 +174,7 @@ public class DriverSite {
 		                       }
 		                       else
 		                       {
-		                    	   return new Response(200, "User not found");
+		                    	   return new Response(200, error);
 		                       }
 		                       
 		                     } 
