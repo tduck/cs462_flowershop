@@ -108,11 +108,22 @@ public class DriverSite {
                                                
             s.register("/home", new WebsiteHandler("web/driver_site"));
             
+            s.register("/login", new JHandler() 
+            {            
+            	 @Override
+                 public Response handle(Request r) 
+            	 {            		 
+            		 System.out.println(r.getBody());
+            		 return new Response(200).pipe(r.getBody());
+            	 }            	
+            });
+            
             // Add new driver
             s.register("/drivers/post", new JHandler() {
                 @Override
                 public Response handle(Request r) {
-                    if(r.getMethod().equals("POST"))
+                	
+                	if(r.getMethod().equals("POST"))
                     {                        	                   	
                     	// Parse query string
                         String query = ServerUtils.inputStreamToString(r.getBody());

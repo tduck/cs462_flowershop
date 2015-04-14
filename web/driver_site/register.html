@@ -5,7 +5,13 @@
 	</head>
 	<body>
 		<h1>Register</h1>
-		<form action='/drivers/post' method='POST'>
+		<p>To sign up for the Driver Site, please authenticate with Foursquare.</p>
+		<a href="https://foursquare.com/oauth2/authorize?client_id=Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV&response_type=code&redirect_uri=https://52.8.41.111/drivers/post/"">
+			<button>
+				Proceed
+			</button>
+		</a>
+		<!-- <form action='/drivers/post' method='POST'>
 			<table>
 				<tr>
 					<td><label>*First Name: </label></td>
@@ -35,7 +41,8 @@
 			<p>(All fields are required.)</p>
 			<br>
 			<input type='submit'>
-		</form>		
+		</form>	->
+		<br>	
 		<p>
 			<a href='/home/main.html'>Back</a>
 		</p>
