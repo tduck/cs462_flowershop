@@ -41,8 +41,8 @@ public class DriverDAO {
         	  driver.setPhone(rs.getString("phone"));
         	  driver.setName(rs.getString("name"));
         	  Location location = new Location();
-        	  location.setLatitude(rs.getFloat("lastlat"));
-        	  location.setLongitude(rs.getFloat("lastlong"));
+        	  location.setLat(rs.getFloat("lastlat"));
+        	  location.setLng(rs.getFloat("lastlong"));
         	  driver.setClockedin(rs.getBoolean("clockedin"));
         	  driver.setAvailable(rs.getBoolean("available"));
         	  driverList.add(driver);
@@ -55,6 +55,28 @@ public class DriverDAO {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public Driver checkin(Driver driver)
+	{
+		try {
+            connection = getConnection();
+            PreparedStatement s = connection.prepareStatement("UPDATE flowershop.drivers SET lastlat = ?, lastlong = ? WHERE id = ?");
+            s.setFloat(1, driver.getLastLocation().getLat());
+            s.setFloat(2, driver.getLastLocation().getLng());
+            s.setString(3, driver.getId());
+            
+            System.out.println(s);
+            s.executeUpdate();
+            
+            connection.close();
+            return driver;
+        } 
+		catch (SQLException e) 
+		{
+            e.printStackTrace();
+            return null;
+        }
 	}
 	
 	public Driver getDriverByPhone(String phone)
@@ -71,8 +93,8 @@ public class DriverDAO {
                 driver.setPhone(phone);
                 driver.setName(rs.getString("phone"));
                 Location location = new Location();
-                location.setLatitude(rs.getFloat("lastlat"));
-                location.setLongitude(rs.getFloat("lastlong"));
+                location.setLat(rs.getFloat("lastlat"));
+                location.setLng(rs.getFloat("lastlong"));
                 driver.setAvailable(rs.getBoolean("available"));
                 driver.setClockedin(rs.getBoolean("clockedin"));
                 driver.setLastLocation(location);
@@ -97,8 +119,8 @@ public class DriverDAO {
             PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.drivers(phone, name, lastlat, lastlong, available, clockedin) VALUES(?, ?, ?, ?, ?, ?)");
             s.setString(1, driver.getPhone());
             s.setString(2, driver.getName());
-            s.setFloat(3, driver.getLastLocation().getLatitude());
-            s.setFloat(4, driver.getLastLocation().getLongitude());
+            s.setFloat(3, driver.getLastLocation().getLat());
+            s.setFloat(4, driver.getLastLocation().getLng());
             s.setBoolean(5, driver.isAvailable());
             s.setBoolean(6, driver.isClockedin());
             s.executeUpdate();
@@ -112,15 +134,19 @@ public class DriverDAO {
     
     public Driver clockIn(Driver driver)
     {
-    	try {
+    	try 
+    	{
             connection = getConnection();
-            PreparedStatement s = connection.prepareStatement("UPDATE flowershop.drivers SET clockedin = ? WHERE phone = ?");
+            PreparedStatement s = connection.prepareStatement("UPDATE flowershop.drivers SET clockedin = ?, available = ? WHERE phone = ?");
             s.setBoolean(1, driver.isClockedin());
-            s.setString(2, driver.getPhone());
+            s.setBoolean(2, driver.isAvailable());
+            s.setString(3, driver.getPhone());
             s.executeUpdate();
             connection.close();
             return driver;
-        } catch (SQLException e) {
+        } 
+    	catch (SQLException e) 
+    	{
             e.printStackTrace();
             return null;
         }

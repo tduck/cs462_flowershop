@@ -1,19 +1,12 @@
 package com.flowershop.driversite;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.model.Driver;
@@ -68,12 +61,51 @@ public class DriverSite {
 		}
 	}
 	
+	private static class Checkin {
+		
+		private Venue venue;
+		private User user;
+					
+		public Venue getVenue() {
+			return venue;
+		}
+		public User getUser() {
+			return user;
+		}
+	}
+	
+	private static class User {
+		
+		private String id;
+		
+		public String getId() {
+			return id;
+		}
+	}
+	
+	private static class Venue
+	{
+		private Location location;
+		private String name;
+		
+		public Venue() {}
+				
+		public String getName() {
+			return name;
+		}
+		
+		public Location getLocation() {
+			return location;
+		}
+	}
+	
 	public static void main(String[] args) {
 		JServer s;
         try {
-			s = new JServer(443, "https", System.getenv("keystorelocation"), System.getenv("keystorepassword"));
-			s.start();
-                                    
+
+            s = new JServer(443, "https", System.getenv("keystorelocation"), System.getenv("keystorepassword"));
+            s.start();
+                                               
             s.register("/home", new WebsiteHandler("web/driver_site"));
             
             // Add new driver
@@ -129,10 +161,16 @@ public class DriverSite {
                 	}
                 	
                 	String list = "<html><head><title>Driver List</title></head><body><table>";
+                	list += "<tr><th>Phone</th>"
+                			+ "<th>Name</th>"
+                			+ "<th>Clocked In?</th>"
+                			+ "<th>Available?</th></tr>";
                 	for (Driver driver : drivers)
                 	{
                 		list += "<tr><td>" + driver.getPhone() + "</td>";
                 		list += "<td>" + driver.getName() + "</td>";
+                		list += "<td>" + driver.isClockedin() + "</td>";
+                		list += "<td>" + driver.isAvailable() + "</td>";
                 		list += "</tr>";
                 	}
                 	list += "</table></body></html>";
@@ -201,16 +239,38 @@ public class DriverSite {
              */
             s.register("/checkin", new JHandler() {             
                 @Override
-                public Response handle(Request r) {
-                	if(r.getMethod().equals("POST")){
-                        try {
-                        	
-                        	// TODO Update user's most recent checkin in database
-                        	
-                            return new Response(200).pipe(r.getBody());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                public Response handle(Request r) 
+                {                              	
+                	if(r.getMethod().equals("POST"))
+                	{
+                    	String checkinString = ServerUtils.inputStreamToString(r.getBody());
+                    	System.out.println(checkinString);   
+                		
+                		Gson gson = new Gson();
+                    	Checkin checkin = gson.fromJson(checkinString, Checkin.class);
+                    	
+                    	System.out.println("HEre");
+                    	System.out.println(checkin.getVenue().getLocation().getLat());
+                    	                        	
+                    	Driver driver = new Driver();
+                    	driver.setId(checkin.getUser().getId());
+                    	driver.setLastLocation(checkin.getVenue().getLocation());
+                    	
+                    	Gson dgson = new Gson();
+                    	String jsonString = dgson.toJson(driver);
+                    	
+                    	System.out.println(jsonString);
+                    	
+                    	String postURL = driversGuildURL + "/drivers/checkin";
+                    	int code = ServerUtils.postJson(postURL, jsonString);
+                    	if (code == 200 || code == 201)
+    					{
+    						 return new Response(200, "Checkin successful.");
+    					}
+    					else
+    					{
+    						return new Response(code);
+    					}                      
                     }
                     return new Response(200, "Checkin");
                 }
@@ -278,6 +338,7 @@ public class DriverSite {
 		                        		String postURL = driversGuildURL + "/drivers/clockin";
 
 	                        			driver.setClockedin(messageParts[1].equals("in") ? true : false);
+	                        			driver.setAvailable(driver.isClockedin());
 	                        			Gson gson = new Gson();
 	                        			String jsonString = gson.toJson(driver);
 	                        			

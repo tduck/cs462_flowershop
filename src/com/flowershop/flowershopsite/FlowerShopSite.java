@@ -77,8 +77,8 @@ public class FlowerShopSite {
                     		 toAdd.setID(flowerShopID);
                     		 toAdd.setName(values.get("location_name"));
                     		 Location location = new Location();
-                    		 location.setLatitude(Float.parseFloat(values.get("latitude")));
-                    		 location.setLongitude(Float.parseFloat(values.get("longitude")));
+                    		 location.setLat(Float.parseFloat(values.get("latitude")));
+                    		 location.setLng(Float.parseFloat(values.get("longitude")));
                     		 toAdd.setLocation(location);
                     		 toAdd = shopDAO.createShop(toAdd);
                     		 

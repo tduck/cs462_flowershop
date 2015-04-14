@@ -4,13 +4,22 @@ package com.flowershop.model;
  * Created by jeffrey on 4/12/15.
  */
 public class Driver {
+	private String id;
     private String phone;
     private String name;
     private Location lastLocation;
     private boolean available;
     private boolean clockedin;
 
-    public boolean isAvailable() {
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public boolean isAvailable() {
 		return available;
 	}
 

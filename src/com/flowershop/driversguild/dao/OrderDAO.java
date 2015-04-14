@@ -39,8 +39,8 @@ public class OrderDAO {
                 order.setDelivered(rs.getBoolean("delivered"));
                 order.setPickedup(rs.getBoolean("pickedup"));
                 Location deliveryLocation = new Location();
-                deliveryLocation.setLatitude(rs.getFloat("latitude"));
-                deliveryLocation.setLongitude(rs.getFloat("longitude"));
+                deliveryLocation.setLat(rs.getFloat("latitude"));
+                deliveryLocation.setLng(rs.getFloat("longitude"));
                 order.setDeliverylocation(deliveryLocation);
                 orders.add(order);
             }
@@ -58,8 +58,8 @@ public class OrderDAO {
             connection.setAutoCommit(false);
             PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.orders(shopid, latitude, longitude, emailaddress, driverphone, address, delivered, pickedup) VALUES (?,?,?,?,?,?,0,0)", PreparedStatement.RETURN_GENERATED_KEYS);
             s.setString(1, order.getShopid());
-            s.setFloat(2, order.getDeliverylocation().getLatitude());
-            s.setFloat(3, order.getDeliverylocation().getLongitude());
+            s.setFloat(2, order.getDeliverylocation().getLat());
+            s.setFloat(3, order.getDeliverylocation().getLng());
             s.setString(4, order.getEmailaddress().replaceAll("%40", "@"));
             s.setString(5, order.getDriverphone());
             s.setString(6, order.getAddress());

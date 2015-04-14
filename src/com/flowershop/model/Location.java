@@ -4,22 +4,22 @@ package com.flowershop.model;
  * Created by jeffrey on 4/12/15.
  */
 public class Location {
-    private float latitude;
-    private float longitude;
+    private float lat;
+    private float lng;
 
-    public float getLatitude() {
-        return latitude;
+    public float getLat() {
+        return lat;
     }
 
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
+    public void setLat(float latitude) {
+        this.lat = latitude;
     }
 
-    public float getLongitude() {
-        return longitude;
+    public float getLng() {
+        return lng;
     }
 
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
+    public void setLng(float longitude) {
+        this.lng = longitude;
     }
 }

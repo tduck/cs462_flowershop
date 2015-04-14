@@ -34,8 +34,8 @@ public class ShopDAO {
         	  shop.setID(rs.getString("id"));
         	  shop.setName(rs.getString("name"));
         	  Location location = new Location();
-        	  location.setLatitude(rs.getFloat("latitude"));
-        	  location.setLongitude(rs.getFloat("longitude"));
+        	  location.setLat(rs.getFloat("latitude"));
+        	  location.setLng(rs.getFloat("longitude"));
         	  shop.setLocation(location);
         	  shopList.add(shop);
           }
@@ -58,8 +58,8 @@ public class ShopDAO {
 
             s.setString(1, shop.getID());
             s.setString(2, shop.getName());
-            s.setFloat(3, shop.getLocation().getLatitude());
-            s.setFloat(4, shop.getLocation().getLongitude());
+            s.setFloat(3, shop.getLocation().getLat());
+            s.setFloat(4, shop.getLocation().getLng());
 
             s.executeUpdate();
             connection.close();
