@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +26,7 @@ import com.twilio.sdk.resource.instance.Message;
 
 import fi.foyt.foursquare.api.FoursquareApi;
 import fi.foyt.foursquare.api.FoursquareApiException;
-import fi.foyt.foursquare.api.Result;
-import fi.foyt.foursquare.api.entities.CheckinGroup;
 import fi.foyt.foursquare.api.entities.CompleteUser;
-import fi.foyt.foursquare.api.entities.Contact;
 
 public class DriverSite {
 	
