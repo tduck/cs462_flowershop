@@ -126,9 +126,9 @@ public class DriverSite {
 	                     if(tail.indexOf("/") == 0)
 	                         tail = tail.substring(1);
 	                     
-	                     System.out.println(tail);
 	                     String code = tail.replaceAll("\\Q?\\Ecode=", "");
-	                     
+	                     System.out.println(code);
+
 	                     if (!code.equals(""))
 	                     {                     
 		                     FoursquareApi foursquareApi = new FoursquareApi(
