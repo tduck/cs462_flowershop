@@ -10,6 +10,7 @@ public class Order {
 	private String driverphone;
     private String address;
     private boolean delivered;
+    private boolean pickedup;
 	private Location deliverylocation;
 
     public int getId() {
@@ -66,5 +67,13 @@ public class Order {
 
 	public void setDelivered(boolean delivered) {
 		this.delivered = delivered;
+	}
+
+	public boolean isPickedup() {
+		return pickedup;
+	}
+
+	public void setPickedup(boolean pickedup) {
+		this.pickedup = pickedup;
 	}
 }

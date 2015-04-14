@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -122,7 +123,7 @@ public class FlowerShopSite {
                      	Map<String, String> values = ServerUtils.getQueryMap(query);
                      	String shopID = values.get("location");
                      	
-                        // TODO Retrieve available bids for orders at the given flower shop location
+                        // Retrieve available bids for orders at the given flower shop location
 
                      	String getURL = driversGuildURL + "/shops/" + shopID + "/orders";
                      	
@@ -165,12 +166,22 @@ public class FlowerShopSite {
 	                     		table += "<tr><th>ID</th>"
 		                     			+ "<th>Delivery Address</th>"
 		                     			+ "<th>Customer Email</th>"
+		                     			+ "<th>Order Picked Up?</th>"
 		                     			+ "<th>Order Delivered?</th></tr>";
 	                     		
 	                   			Order order = gson.fromJson(orderString.trim(), Order.class);
 	                   			table += "<tr><td>" + order.getId() + "</td>";
 	                     		table += "<td>" + order.getAddress() + "</td>";
 	                     		table += "<td>" + order.getEmailaddress() + "</td>";
+	                     		if (order.isPickedup())
+	                     		{
+	                     			table += "<td>" + order.isPickedup() + "</td>";
+	                     		}
+	                     		else
+	                     		{
+	                     			table += "<td><form action='/delivery_pickup' method='POST'><input type='hidden' name='id' value='" + order.getId() + "'>";
+	                     			table += "<input type='submit' value='Confirm'></form></td>";
+	                     		}
 	                     		table += "<td>" + order.isDelivered() + "</td></tr>";
 	                     		
 	                     		/**
@@ -341,14 +352,68 @@ public class FlowerShopSite {
                 @Override
                 public Response handle(Request r) {
                      if(r.getMethod().equals("POST")){
-                         try {
+                         try 
+                         {                        	 
+                        	 String query = ServerUtils.inputStreamToString(r.getBody());
+                        	 Map<String, String> values = ServerUtils.getQueryMap(query);
+                        	 System.out.println(values.toString());
                         	 
+                        	 Order order = new Order();
+                        	 order.setId(Integer.parseInt(values.get("id")));
+                        	 order.setPickedup(true);
+                        	 
+                        	 Gson gson = new Gson();
+                        	 String jsonString = gson.toJson(order);
+                        	
                         	 // TODO Send event to Drivers' Guild
-                        	 
-                        	 
-                             return new Response(200).pipe(r.getBody());
-                         } catch (Exception e) {
+                        	 String postURL = driversGuildURL + "/orders/pickup";
+                    		 URL obj = new URL(postURL);
+                    		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                    		 
+                    		 con.setRequestMethod("POST");
+                    		 con.setDoOutput(true);
+                    		 con.setRequestProperty("Content-Type", "application/json");
+                    		 
+                    		 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                    		 wr.writeBytes(jsonString);
+                   		 
+                    		 wr.flush();
+                    		 wr.close();
+                    		 
+                    		 
+                       		 	int responseCode = con.getResponseCode();
+	                    		System.out.println("\nSending 'POST' request to URL : " + postURL);
+	                    		System.out.println("Post parameters : " + jsonString);
+	                    		System.out.println("Response Code : " + responseCode);
+	                     
+	                    		BufferedReader in = new BufferedReader(
+	                    		        new InputStreamReader(con.getInputStream()));
+	                    		String inputLine;
+	                    		StringBuffer response = new StringBuffer();
+	                     
+	                    		while ((inputLine = in.readLine()) != null) {
+	                    			response.append(inputLine);
+	                    		}
+	                    		in.close();
+	                    	
+                     
+	                    		//print result
+	                    		System.out.println(response.toString());
+                       		
+                    		                         		                        		                         		 							
+							 if (con.getResponseCode() == 200)
+							 {
+								 return new Response(200, "Order pickup marked successfully.");
+							 }
+							 else
+							 {
+								 return new Response(500);
+							 }
+                         } 
+                         catch (Exception e) 
+                         {
                              e.printStackTrace();
+                             return new Response(500);
                          }
                      }
                      return new Response(405);

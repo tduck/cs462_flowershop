@@ -9,5 +9,6 @@ CREATE TABLE flowershop.orders(
 	address VARCHAR(256) NOT NULL,
 	latitude FLOAT NOT NULL,
 	longitude FLOAT NOT NULL,
+	pickedup BOOLEAN,
 	PRIMARY KEY(id)
 );

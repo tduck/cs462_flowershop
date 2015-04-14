@@ -37,6 +37,7 @@ public class OrderDAO {
                 order.setEmailaddress(rs.getString("emailaddress"));
                 order.setDriverphone(rs.getString("driverphone"));
                 order.setDelivered(rs.getBoolean("delivered"));
+                order.setPickedup(rs.getBoolean("pickedup"));
                 Location deliveryLocation = new Location();
                 deliveryLocation.setLatitude(rs.getFloat("latitude"));
                 deliveryLocation.setLongitude(rs.getFloat("longitude"));
@@ -55,10 +56,13 @@ public class OrderDAO {
         try {
             connection = getConnection();
             connection.setAutoCommit(false);
-            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.orders(shopid, latitude, longitude) VALUES (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.orders(shopid, latitude, longitude, emailaddress, driverphone, address, delivered, pickedup) VALUES (?,?,?,?,?,?,0,0)", PreparedStatement.RETURN_GENERATED_KEYS);
             s.setString(1, order.getShopid());
             s.setFloat(2, order.getDeliverylocation().getLatitude());
             s.setFloat(3, order.getDeliverylocation().getLongitude());
+            s.setString(4, order.getEmailaddress());
+            s.setString(5, order.getDriverphone());
+            s.setString(6, order.getAddress());
             s.executeUpdate();
             ResultSet rs = s.getGeneratedKeys();
             rs.next();
@@ -84,6 +88,28 @@ public class OrderDAO {
 	        connection.setAutoCommit(false);
 	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET delivered = ? WHERE id = ?");
 	        s.setBoolean(1, order.isDelivered()); 
+	        s.setInt(2, order.getId());
+	        System.out.println(s.toString());
+	        s.executeUpdate();
+	        connection.commit();
+	        connection.close();	        
+	        return order;
+        } 
+        catch (SQLException e) 
+        {
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
+    public Order pickupOrder(Order order)
+    {
+        try 
+        {
+			connection = getConnection();
+	        connection.setAutoCommit(false);
+	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET pickedup = ? WHERE id = ?");
+	        s.setBoolean(1, order.isPickedup()); 
 	        s.setInt(2, order.getId());
 	        System.out.println(s.toString());
 	        s.executeUpdate();
