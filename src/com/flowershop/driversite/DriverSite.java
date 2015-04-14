@@ -113,7 +113,7 @@ public class DriverSite {
             	 @Override
                  public Response handle(Request r) 
             	 {            		 
-            		 System.out.println(r.getBody());
+            		 System.out.println(ServerUtils.inputStreamToString(r.getBody()));
             		 return new Response(200).pipe(r.getBody());
             	 }            	
             });
