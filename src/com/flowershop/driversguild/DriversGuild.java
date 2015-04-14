@@ -2,6 +2,7 @@ package com.flowershop.driversguild;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.flowershop.ServerUtils;
@@ -126,7 +127,17 @@ public class DriversGuild {
                      if(r.getMethod().equals("POST")){
                          try {
                         	 System.out.println(ServerUtils.inputStreamToString(r.getBody()));
-                             return new Response(200).pipe(r.getBody());
+                        	 
+                        	 // Parse query string
+                        	 String query = ServerUtils.inputStreamToString(r.getBody());
+                         	 Map<String, String> values = ServerUtils.getQueryMap(query);
+
+                        	 if (values.get("id") != null && values.get("delivered") != null)
+                        	 {
+                            	 orderDAO.setOrderComplete(values.get("id"), values.get("delivered"));
+                        	 }
+                        	 
+                        	 return new Response(200).pipe(r.getBody());
                          } catch (Exception e) {
                              e.printStackTrace();
                          }
