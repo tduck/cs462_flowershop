@@ -1,11 +1,14 @@
 package com.flowershop.driversguild;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 import com.flowershop.ServerUtils;
+import com.flowershop.driversguild.dao.DeliveryDAO;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.driversguild.dao.OrderDAO;
+import com.flowershop.model.Delivery;
 import com.flowershop.model.Driver;
 import com.flowershop.model.Order;
 import com.google.gson.Gson;
@@ -17,10 +20,13 @@ import com.jeffrey.server.Response;
 public class DriversGuild {
     static DriverDAO driverDAO;
     static OrderDAO orderDAO;
+    static DeliveryDAO deliveryDAO;
 
 	public static void main(String[] args) {
 		driverDAO = new DriverDAO();
         orderDAO = new OrderDAO();
+        deliveryDAO = new DeliveryDAO();
+        
 		JServer s;
         try {
             s = new JServer(8080);
@@ -33,10 +39,10 @@ public class DriversGuild {
                         String tail = request.getURI().toString().substring(request.getPath().length());
                         if(tail.indexOf("/") == 0)
                             tail = tail.substring(1);
-
+                        
                         String id = tail.substring(0, tail.indexOf("/"));
                         if(tail.substring(tail.indexOf("/")).equals("/orders")){
-                            Object o = orderDAO.getOrders(id);
+                            List<Order> o = orderDAO.getOrders(id);
                             if(o == null)
                                 return null;
                             return new Response(200).send(o);
@@ -74,7 +80,24 @@ public class DriversGuild {
             s.register("/orders", new JHandler() {
                 @Override
                 public Response handle(Request request) {
-                    if(request.getMethod().equals("POST")){
+                	if(request.getMethod().equals("GET")) 
+                	{
+                        String tail = request.getURI().toString().substring(request.getPath().length());
+                        if(tail.indexOf("/") == 0)
+                            tail = tail.substring(1);
+                        
+                        System.out.println(tail);
+                        String id = tail.substring(0, tail.indexOf("/"));
+                        if(tail.substring(tail.indexOf("/")).equals("/deliveries")){
+                            List<Delivery> o = deliveryDAO.getDeliveries(Integer.parseInt(id));
+                            if(o == null)
+                                return null;
+                            return new Response(200).send(o);
+                        }
+                        return new Response(400);
+                    }
+                	else if(request.getMethod().equals("POST"))
+                	{
                         Scanner scanner = new Scanner(request.getBody());
                         scanner.useDelimiter("\\A");
                         Gson gson = new Gson();

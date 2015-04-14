@@ -6,16 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import com.flowershop.ServerUtils;
-import com.flowershop.driversguild.dao.DeliveryDAO;
-import com.flowershop.driversguild.dao.OrderDAO;
 import com.flowershop.driversguild.dao.ShopDAO;
 import com.flowershop.model.Delivery;
 import com.flowershop.model.Location;
@@ -126,47 +124,95 @@ public class FlowerShopSite {
                      	
                         // TODO Retrieve available bids for orders at the given flower shop location
 
-                     	String getURL = driversGuildURL + "/shops/:" + shopID + "/orders";
+                     	String getURL = driversGuildURL + "/shops/" + shopID + "/orders";
                      	
  	                	try
                      	{
+ 	                		/**
+ 	                		 * Get all orders for the selected shop
+ 	                		 */
 	                     	URL obj = new URL(getURL);
 		               		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		               		 
 		               		String contents = ServerUtils.inputStreamToString(con.getInputStream());
-		              		 
- 	                   		System.out.println("\nSending 'GET' request to URL : " + getURL);
-	                   		System.out.println("results: " + contents);
+	                   		contents = contents.substring(1, contents.length() - 1);
+
+ 	                   		System.out.println("Sending 'GET' request to URL : " + getURL);
+	                   		System.out.println("Results: " + contents);
 	                   		System.out.println("Response Code : " + con.getResponseCode());
 	                   		
+	                   		Gson gson = new Gson();
+	                   		String[] orderStrings = contents.split("\\Q}\\E,\\Q{\\E");
+	                   		for (int i=0; i<orderStrings.length; i++)
+	                   		{
+	                   			if (i > 0)
+	                   			{
+	                   				orderStrings[i] = "{" + orderStrings[i];
+	                   			}
+	                   			
+	                   			if (i < orderStrings.length - 1)
+	                   			{
+	                   				orderStrings[i] += "}";
+	                   			}
+	                   		}
+	                   		// System.out.println(Arrays.toString(orderStrings));
+	                   		
 	                   		String content = ServerUtils.getFileContents("web/flower_shop/admin.html");
-	                     	String table = "<table><tr><th>ID</th>"
-	                     			+ "<th>Delivery Address</th>"
-	                     			+ "<th>Customer Email</th>"
-	                     			+ "<th></th></tr>";
-//	                     	for (Order order : orders)
-//	                     	{
-//	                     		table += "<tr><td>" + order.getId() + "</td>";
-//	                     		table += "<td>" + order.getAddress() + "</td>";
-//	                     		table += "<td>" + order.getEmailaddress() + "</td>";
-//	                     		table += "<td><form action='' method='POST'>" + "<input type='submit'></form></td></tr>";
-//	                     		
-//	                     		table += "<tr>";
-//	                     		List<Delivery> deliveries = deliveryDAO.getDeliveries(order.getId());
-//	                     		if (deliveries == null)
-//	                     		{
-//	                     			return new Response(500);
-//	                     		}
-//	                     		
-//	                 			table += "<table><tr><th>Driver Phone</th></tr>";
-//
-//	                     		for (Delivery delivery : deliveries)
-//	                     		{                     			
-//	                     			table += "<tr><td>" + delivery.getDriverphone() + "</td></tr></table>";
-//	                     		}
-//	                     		
-//	                     		table += "</tr>";
-//	                     	}
+	                     	String table = "<table>";
+	                     	
+	                     	for (String orderString : orderStrings)
+	                   		{
+	                     		table += "<tr><th>ID</th>"
+		                     			+ "<th>Delivery Address</th>"
+		                     			+ "<th>Customer Email</th>"
+		                     			+ "<th>Order Delivered?</th></tr>";
+	                     		
+	                   			Order order = gson.fromJson(orderString.trim(), Order.class);
+	                   			table += "<tr><td>" + order.getId() + "</td>";
+	                     		table += "<td>" + order.getAddress() + "</td>";
+	                     		table += "<td>" + order.getEmailaddress() + "</td>";
+	                     		table += "<td>" + order.isDelivered() + "</td></tr>";
+	                     		
+	                     		/**
+	                     		 *  Make another HTTP Request to see all drivers with delivery "bids" on each order
+	                     		 */
+	                     		getURL = driversGuildURL + "/orders/" + order.getId() + "/deliveries";
+	                     		
+	                     		URL deliveryURL = new URL(getURL);
+			               		HttpURLConnection deliveryCon = (HttpURLConnection) deliveryURL.openConnection();
+			               		 
+			               		String deliveryResult = ServerUtils.inputStreamToString(deliveryCon.getInputStream());
+			               		deliveryResult = deliveryResult.substring(1, deliveryResult.length() - 1);
+	                     		if (deliveryResult.length() > 0)
+	                     		{			               		
+				               		String[] deliveryStrings = deliveryResult.split("\\Q}\\E,\\Q{\\E");
+				               		for (int i=0; i<deliveryStrings.length; i++)
+			                   		{
+			                   			if (i > 0)
+			                   			{
+			                   				deliveryStrings[i] = "{" + deliveryStrings[i];
+			                   			}
+			                   			
+			                   			if (i < deliveryStrings.length - 1)
+			                   			{
+			                   				deliveryStrings[i] += "}";
+			                   			}
+			                   		}
+				               		
+				               		// System.out.println(Arrays.toString(deliveryStrings));
+				               		table += "<tr><th>Driver Phone</th><th>Assigned?</th></tr>";
+		                     		for (String deliveryString : deliveryStrings)
+		                     		{		          
+		                     			if (deliveryString != "[]")
+		                     			{
+			                     			Delivery delivery = gson.fromJson(deliveryString.trim(), Delivery.class);
+			                     			table += "<tr><td>" + delivery.getDriverphone() + "</td>";
+			                     			table += "<td>" + delivery.isAccepted() + "</td></tr>";
+		                     			}
+		                     		}
+	                     		}
+	                   		}
+	                     		                     	
 	                     	table += "</table>";
 	                     	
 	                     	return new Response(200, content.replaceAll("<table></table>", table));
@@ -358,7 +404,7 @@ public class FlowerShopSite {
             
             /*
              * RFQ Bid Available Event Consumer
-             */
+             *
             s.register("/rfq_bid_available", new JHandler() {
                 @Override
                 public Response handle(Request r) {
@@ -375,7 +421,7 @@ public class FlowerShopSite {
                      return new Response(405);
                 }
             });
-            
+            */
             
             /**
              * 

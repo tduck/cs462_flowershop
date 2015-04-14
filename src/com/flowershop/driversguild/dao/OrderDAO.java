@@ -33,6 +33,10 @@ public class OrderDAO {
                 Order order = new Order();
                 order.setShopid(shopid);
                 order.setId(rs.getInt("id"));
+                order.setAddress(rs.getString("address"));
+                order.setEmailaddress(rs.getString("emailaddress"));
+                order.setDriverphone(rs.getString("driverphone"));
+                order.setDelivered(rs.getBoolean("delivered"));
                 Location deliveryLocation = new Location();
                 deliveryLocation.setLatitude(rs.getFloat("latitude"));
                 deliveryLocation.setLongitude(rs.getFloat("longitude"));
