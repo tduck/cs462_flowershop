@@ -26,6 +26,13 @@ import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
 import com.twilio.sdk.resource.instance.Message;
 
+import fi.foyt.foursquare.api.FoursquareApi;
+import fi.foyt.foursquare.api.FoursquareApiException;
+import fi.foyt.foursquare.api.Result;
+import fi.foyt.foursquare.api.entities.CheckinGroup;
+import fi.foyt.foursquare.api.entities.CompleteUser;
+import fi.foyt.foursquare.api.entities.Contact;
+
 public class DriverSite {
 	
 	private final static String ACCOUNT_SID = "AC15f0c7bd26137ed319deffa2022b84cb";
@@ -89,14 +96,7 @@ public class DriverSite {
 	private static class Venue
 	{
 		private Location location;
-		private String name;
-		
-		public Venue() {}
 				
-		public String getName() {
-			return name;
-		}
-		
 		public Location getLocation() {
 			return location;
 		}
@@ -104,10 +104,10 @@ public class DriverSite {
 	
 	private static class Access {
 	
-		private String accesscode;
+		private String access_token;
 		
-		public String getAccesscode() {
-			return accesscode;
+		public String getAccessToken() {
+			return access_token;
 		}
 	}
 	
@@ -143,27 +143,48 @@ public class DriverSite {
 		                    	    + "&redirect_uri=https://52.8.41.111/login/"
 		                    	    + "&code=" + code;
 		                     
-		                    
-		                    URL obj = new URL(getURL);
-			               	HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			               		 
-			               	if (con.getResponseCode() != 200)
-			               	{
-			               		return new Response(400);
-			               	}
-			               	
-			               	String contents = ServerUtils.inputStreamToString(con.getInputStream());
-	
-		                   	System.out.println("Sending 'GET' request to URL : " + getURL);
-		                   	System.out.println("Results: " + contents);
-		                   	System.out.println("Response Code : " + con.getResponseCode());
+		                     FoursquareApi foursquareApi = new FoursquareApi(
+		                    		 "Z5RSCN1KCRNULHOGJRPLQSTXDRUGHIKSASD5KBYM1EB31CNV", 
+		                    		 "OM4XSTGXFGFKTZP4V0CIALIA4ZOAZNSS25CMYYRNCCUPNXN3", 
+		                    		 "https://52.8.41.111/login/");
 		                     
-		                   	Gson gson = new Gson();
-		                   	Access access = gson.fromJson(contents, Access.class);
-		                   	
-		                   	System.out.println(access.getAccesscode());
-		                   	
-		            		return new Response(200, tail);
+		                     // Callback url contains authorization code 
+		                     try 
+		                     {
+		                       // finally we need to authenticate that authorization code 
+		                       foursquareApi.authenticateCode(code);
+		                       
+		                       CompleteUser user = foursquareApi.user("self").getResult();
+		                       System.out.println(user.toString());
+		                       
+		                       Driver driver = new Driver();
+		                       driver.setId(user.getId());
+		                       driver.setName(user.getFirstName() + " " + user.getLastName());
+		                       driver.setPhone(user.getContact().getPhone());
+		                       driver.setAvailable(false);
+		                       driver.setClockedin(false);
+		                       
+		                       fi.foyt.foursquare.api.entities.Checkin[] checkins = foursquareApi.usersCheckins("self", null, null, null, null).getResult().getItems();
+		                       fi.foyt.foursquare.api.entities.Checkin c = checkins[0];
+		                       Location l = new Location();
+		                       l.setLat(c.getLocation().getLat().floatValue());
+		                       l.setLng(c.getLocation().getLng().floatValue());
+		                       driver.setLastLocation(l);
+		                       
+		                       Gson dgson = new Gson();
+		                       String jsonString = dgson.toJson(driver);
+		                       
+		                       System.out.println(jsonString);
+		                       return new Response(200, jsonString);
+		                       
+		                     } 
+		                     catch (FoursquareApiException e) 
+		                     {
+		                      // TODO: Error handling
+		                    	 return new Response(500);
+		                     } 
+		                     
+		            		 return new Response(200, tail);
 	                     }
 	                     
 	                     else
