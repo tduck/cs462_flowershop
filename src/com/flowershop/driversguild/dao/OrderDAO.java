@@ -87,6 +87,7 @@ public class OrderDAO {
 	        s.setInt(2, order.getId());
 	        System.out.println(s.toString());
 	        s.executeUpdate();
+	        connection.commit();
 	        connection.close();	        
 	        return order;
         } 
