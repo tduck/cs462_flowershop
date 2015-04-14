@@ -7,8 +7,26 @@ public class Driver {
     private String phone;
     private String name;
     private Location lastLocation;
+    private boolean available;
+    private boolean clockedin;
 
-    public String getPhone() {
+    public boolean isAvailable() {
+		return available;
+	}
+
+	public void setAvailable(boolean available) {
+		this.available = available;
+	}
+
+	public boolean isClockedin() {
+		return clockedin;
+	}
+
+	public void setClockedin(boolean clockedin) {
+		this.clockedin = clockedin;
+	}
+
+	public String getPhone() {
         return phone;
     }
 

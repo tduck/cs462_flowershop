@@ -5,5 +5,7 @@ CREATE TABLE flowershop.drivers(
 	name VARCHAR(32) NOT NULL,
 	lastlat FLOAT,
 	lastlong FLOAT,
+	clockedin BOOLEAN,
+	available BOOLEAN,
 	PRIMARY KEY(phone)
 );

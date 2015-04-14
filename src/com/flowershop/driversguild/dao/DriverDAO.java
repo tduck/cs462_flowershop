@@ -43,6 +43,8 @@ public class DriverDAO {
         	  Location location = new Location();
         	  location.setLatitude(rs.getFloat("lastlat"));
         	  location.setLongitude(rs.getFloat("lastlong"));
+        	  driver.setClockedin(rs.getBoolean("clockedin"));
+        	  driver.setAvailable(rs.getBoolean("available"));
         	  driverList.add(driver);
           }
           connection.close();
@@ -71,6 +73,8 @@ public class DriverDAO {
                 Location location = new Location();
                 location.setLatitude(rs.getFloat("lastlat"));
                 location.setLongitude(rs.getFloat("lastlong"));
+                driver.setAvailable(rs.getBoolean("available"));
+                driver.setClockedin(rs.getBoolean("clockedin"));
                 driver.setLastLocation(location);
             }
             else
@@ -90,9 +94,29 @@ public class DriverDAO {
     public Driver createDriver(Driver driver){
         try {
             connection = getConnection();
-            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.drivers(phone, name) VALUES(?, ?)");
+            PreparedStatement s = connection.prepareStatement("INSERT INTO flowershop.drivers(phone, name, lastlat, lastlong, available, clockedin) VALUES(?, ?, ?, ?, ?, ?)");
             s.setString(1, driver.getPhone());
             s.setString(2, driver.getName());
+            s.setFloat(3, driver.getLastLocation().getLatitude());
+            s.setFloat(4, driver.getLastLocation().getLongitude());
+            s.setBoolean(5, driver.isAvailable());
+            s.setBoolean(6, driver.isClockedin());
+            s.executeUpdate();
+            connection.close();
+            return driver;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public Driver clockIn(Driver driver)
+    {
+    	try {
+            connection = getConnection();
+            PreparedStatement s = connection.prepareStatement("UPDATE flowershop.drivers SET clockedin = ? WHERE phone = ?");
+            s.setBoolean(1, driver.isClockedin());
+            s.setString(2, driver.getPhone());
             s.executeUpdate();
             connection.close();
             return driver;

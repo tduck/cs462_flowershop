@@ -121,6 +121,39 @@ public class DriversGuild {
                 }
             });
             
+            s.register("/drivers/clockin", new JHandler() {
+            	@Override
+                public Response handle(Request r) 
+            	{
+                     if(r.getMethod().equals("POST"))
+                     {					
+						String json = ServerUtils.inputStreamToString(r.getBody());
+						Gson gson = new Gson();
+						Driver driver;
+						System.out.println(json);
+						try 
+						{
+						     driver = gson.fromJson(json.trim(), Driver.class);
+						} 
+						catch(Exception e)
+						{
+						 	e.printStackTrace();
+						    return new Response(500);
+						}
+						driver = driverDAO.clockIn(driver);
+						if (driver != null)
+						{
+							return new Response(200, json);
+						}
+						else 
+						{
+						    return new Response(500);
+						}
+					}
+					return new Response(405);
+                }
+            });
+            
             s.register("/orders/complete", new JHandler() {
             	@Override
                 public Response handle(Request r) 
