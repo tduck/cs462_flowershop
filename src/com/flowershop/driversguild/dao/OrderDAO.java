@@ -1,5 +1,6 @@
 package com.flowershop.driversguild.dao;
 
+import com.flowershop.driversguild.DriversGuild;
 import com.flowershop.model.Location;
 import com.flowershop.model.Order;
 
@@ -68,6 +69,7 @@ public class OrderDAO {
             rs.next();
             order.setId(rs.getInt(1));
             connection.commit();
+            DriversGuild.flagChanged();
             return order;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -92,7 +94,8 @@ public class OrderDAO {
 	        System.out.println(s.toString());
 	        s.executeUpdate();
 	        connection.commit();
-	        connection.close();	        
+	        connection.close();
+            DriversGuild.flagChanged();
 	        return order;
         } 
         catch (SQLException e) 
@@ -109,15 +112,15 @@ public class OrderDAO {
 			connection = getConnection();
 	        connection.setAutoCommit(false);
 	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET pickedup = ? WHERE id = ?");
-	        s.setBoolean(1, order.isPickedup()); 
+	        s.setBoolean(1, order.isPickedup());
 	        s.setInt(2, order.getId());
 	        System.out.println(s.toString());
 	        s.executeUpdate();
 	        connection.commit();
-	        connection.close();	        
+	        connection.close();
 	        return order;
-        } 
-        catch (SQLException e) 
+        }
+        catch (SQLException e)
         {
 			e.printStackTrace();
 			return null;
