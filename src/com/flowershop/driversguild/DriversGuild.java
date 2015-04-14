@@ -119,6 +119,21 @@ public class DriversGuild {
                     }
                 }
             });
+            
+            s.register("/orders/complete", new JHandler() {
+            	@Override
+                public Response handle(Request r) {
+                     if(r.getMethod().equals("POST")){
+                         try {
+                        	 System.out.println(ServerUtils.inputStreamToString(r.getBody()));
+                             return new Response(200).pipe(r.getBody());
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     return new Response(405);
+                }
+            });
                        
             /*s.register("/main", new JHandler() {
                 @Override

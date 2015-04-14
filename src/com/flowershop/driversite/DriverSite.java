@@ -18,6 +18,7 @@ import com.flowershop.ServerUtils;
 import com.flowershop.driversguild.dao.DriverDAO;
 import com.flowershop.model.Driver;
 import com.flowershop.model.Location;
+import com.flowershop.model.Order;
 import com.google.gson.Gson;
 import com.jeffrey.server.*;
 
@@ -275,12 +276,64 @@ public class DriverSite {
                         // Type 2: Delivery Complete
                         // TODO send event to driver's guild                   
                         // TODO send event to flower shop website
-                    	                	
-                		System.out.println(ServerUtils.inputStreamToString(r.getBody()));
+                    	                	               		
+                		// Parse query string
+                        String query = ServerUtils.inputStreamToString(r.getBody());
+                    	Map<String, String> values = ServerUtils.getQueryMap(query);
+
+                        System.out.println(values.toString());
+                        
+                        if (values.get("From") == null)
+                        {
+                        	return new Response(400);
+                        }
+                        
+                        String driverphone = values.get("From").replaceAll("%2B", "");
+                        
+                        try
+                        {                  	
+                        	if (values.get("Body") != null)
+	                        {
+	                        	if (values.get("Body").toLowerCase().contains("delivered"))
+	                        	{
+	                        		String[] body = values.get("Body").split(" ");
+	                        		
+	                        		String postURL = driversGuildURL + "/orders/complete";
+	                        		
+	                        		Order order = new Order();
+	                        		order.setId(Integer.parseInt(body[1]));
+	                        		Gson gson = new Gson();
+		                   			String jsonString = gson.toJson(order);
+		                   			 
+		                       		URL obj = new URL(postURL);
+		                       		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		                       		
+		                       		con.setRequestMethod("POST");
+		                       		con.setDoOutput(true);
+		                       		con.setRequestProperty("Content-Type", "application/json");
+		                       		 
+		                       		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		                       		wr.writeBytes(jsonString);
+		                      		 
+		                       		wr.flush();
+		                       		wr.close();
+	                        	}
+	                        	
+	                        	else if (values.get("Body").toLowerCase().contains("delivered"))
+	                        	{
+	                        		
+	                        	}
+	                        }
+	                        
+                        }
+                        catch (Exception e)
+                        {
+                        	e.printStackTrace();
+                        	return new Response(500);
+                        }                        
                 		
-                		
-                		
-                		try {
+                		try 
+                		{
 							return new Response(200).pipe(new FileInputStream(new File("sms/echo.xml")));
 						} 
                 		catch (FileNotFoundException e) 
