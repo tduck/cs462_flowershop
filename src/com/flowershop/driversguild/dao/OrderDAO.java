@@ -76,15 +76,15 @@ public class OrderDAO {
         }
     }
     
-    public boolean setOrderComplete(String id, String status)
+    public boolean setOrderComplete(int i, boolean b)
     {
         try 
         {
 			connection = getConnection();
 	        connection.setAutoCommit(false);
 	        PreparedStatement s = connection.prepareStatement("UPDATE flowershop.orders SET delivered = ? WHERE id = ?");
-	        s.setString(1, status); 
-	        s.setString(2, id);
+	        s.setBoolean(1, b); 
+	        s.setInt(2, i);
 	        s.executeUpdate();
 	        connection.close();	        
 	        return true;
